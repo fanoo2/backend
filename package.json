@@ -1,6 +1,7 @@
 {
   "name": "@fanoo2/backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "AI Annotation Backend",
   "main": "dist/index.js",
   "scripts": {
