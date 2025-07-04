@@ -311,6 +311,40 @@ paths:
 
 components:
   schemas:
+      CreateSessionRequest:
+      type: object
+      properties:
+        amount:
+          type: integer
+          description: Amount in cents
+        currency:
+          type: string
+      required:
+        - amount
+        - currency
+
+    CreateSessionResponse:
+      type: object
+      properties:
+        sessionId:
+          type: string
+      required:
+        - sessionId
+
+    StripeWebhookEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        data:
+          type: object
+          description: Stripe event payload
+      required:
+        - id
+        - type
+        - data
     HealthResponse:
       type: object
       properties:
