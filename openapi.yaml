@@ -13,6 +13,49 @@ servers:
     description: Development server
 
 paths:
+  /payments/create-session:
+    post:
+      summary: Create a Stripe Checkout Session
+      operationId: createCheckoutSession
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        '200':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSessionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /payments/webhook:
+    post:
+      summary: Stripe Webhook receiver
+      operationId: handleStripeWebhook
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StripeWebhookEvent'
+      responses:
+        '200':
+          description: Webhook processed
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /health:
     get:
       summary: Health check endpoint
