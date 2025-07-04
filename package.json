@@ -1,15 +1,28 @@
 {
-  "name": "nodejs",
+  "name": "@fanoo2/backend",      // use your npm/GitHub package scope if needed
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "AI Annotation Backend",
+  "main": "dist/index.js",     // point at your built output
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node-esm --esm --transpile-only index.ts",     // for fast local iteration
+    "build": "tsc",                                             // compile to dist/
+    "start": "node dist/index.js",                             // production start
+    "lint": "eslint . --ext .ts",                              // if you add ESLint
+    "test": "npm run build && node dist/index.js --health"     // simple smoke check
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "@types/node": "^22.13.11"
+    "express": "^4.18.2",
+    "drizzle-kit": "^0.31.4",
+    "nanoid": "^5.1.5",
+    "openai": "^4.0.0",             // add your OpenAI SDK
+    "@drizzle-orm/postgres": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6",
+    "ts-node-esm": "^2.0.0",
+    "@types/express": "^4.17.17",
+    "eslint": "^8.0.0",             // if you want linting
+    "@typescript-eslint/parser": "^5.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0"
   }
 }

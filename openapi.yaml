@@ -1,0 +1,574 @@
+openapi: 3.0.3
+info:
+  title: Fanno Platform API
+  description: AI-driven platform automation API for agent orchestration
+  version: 1.0.0
+  contact:
+    name: Fanno Platform Team
+    email: api@fanno.com
+servers:
+  - url: https://api.fanno.com/v1
+    description: Production server
+  - url: http://localhost:5000/api
+    description: Development server
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Check if the API service is running and healthy
+      operationId: getHealth
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /stats:
+    get:
+      summary: Get platform statistics
+      operationId: getStats
+      tags:
+        - Platform
+      responses:
+        '200':
+          description: Platform statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformStats'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /agents:
+    get:
+      summary: List all AI agents
+      operationId: getAgents
+      tags:
+        - Agents
+      responses:
+        '200':
+          description: List of AI agents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Agent'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /agents/{id}:
+    get:
+      summary: Get specific agent
+      operationId: getAgent
+      tags:
+        - Agents
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Agent details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      summary: Update agent configuration
+      operationId: updateAgent
+      tags:
+        - Agents
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentUpdateRequest'
+      responses:
+        '200':
+          description: Updated agent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /annotate:
+    post:
+      summary: Annotate text with AI insights
+      operationId: annotateText
+      tags:
+        - AI Services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnnotateRequest'
+      responses:
+        '200':
+          description: Text annotations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnnotateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /annotations:
+    get:
+      summary: Get recent annotations
+      description: Retrieve recent text annotation API usage logs for monitoring purposes
+      operationId: getAnnotations
+      tags:
+        - Annotations
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of annotations to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Recent annotations retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Annotation'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /phases:
+    get:
+      summary: Get setup phases
+      operationId: getPhases
+      tags:
+        - Setup
+      responses:
+        '200':
+          description: List of setup phases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Phase'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /repositories:
+    get:
+      summary: Get GitHub repositories
+      operationId: getRepositories
+      tags:
+        - Organization
+      responses:
+        '200':
+          description: List of repositories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Repository'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /services:
+    get:
+      summary: Get system services
+      operationId: getServices
+      tags:
+        - Monitoring
+      responses:
+        '200':
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /activities:
+    get:
+      summary: Get recent activities
+      operationId: getActivities
+      tags:
+        - Monitoring
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: List of activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /workflows:
+    get:
+      summary: Get agent workflows
+      operationId: getWorkflows
+      tags:
+        - Workflows
+      responses:
+        '200':
+          description: List of workflows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workflow'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy]
+          description: Health status of the service
+        timestamp:
+          type: string
+          format: date-time
+          description: Current server timestamp
+        service:
+          type: string
+          description: Service identifier
+      required:
+        - status
+        - timestamp
+        - service
+
+    PlatformStats:
+      type: object
+      properties:
+        activeAgents:
+          type: integer
+          description: Number of active AI agents
+        completedTasks:
+          type: integer
+          description: Number of completed tasks
+        progress:
+          type: integer
+          description: Overall setup progress percentage
+      required:
+        - activeAgents
+        - completedTasks
+        - progress
+
+    Agent:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+          enum: [ui-ux, webrtc, backend, frontend, payment, moderation, devops]
+        description:
+          type: string
+        status:
+          type: string
+          enum: [pending, configuring, active, error]
+        config:
+          type: object
+          additionalProperties: true
+        emoji:
+          type: string
+        provider:
+          type: string
+        lastUpdated:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - type
+        - description
+        - status
+        - config
+        - emoji
+        - provider
+        - lastUpdated
+
+    AgentUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        config:
+          type: object
+          additionalProperties: true
+        emoji:
+          type: string
+        provider:
+          type: string
+
+    AnnotateRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Text to be annotated
+          minLength: 1
+          maxLength: 10000
+      required:
+        - text
+
+    AnnotateResponse:
+      type: object
+      properties:
+        annotations:
+          type: array
+          items:
+            type: string
+          description: List of AI-generated annotations for the text
+      required:
+        - annotations
+
+    Annotation:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the annotation
+        inputText:
+          type: string
+          description: Original text that was annotated
+        resultJson:
+          type: object
+          description: Annotation result containing metadata and analysis
+          properties:
+            annotations:
+              type: array
+              items:
+                type: string
+              description: Generated annotations
+            analysisMethod:
+              type: string
+              enum: [openai, basic]
+              description: Method used for analysis
+            timestamp:
+              type: string
+              format: date-time
+              description: When the analysis was performed
+            inputLength:
+              type: integer
+              description: Character count of input text
+            annotationCount:
+              type: integer
+              description: Number of annotations generated
+        createdAt:
+          type: string
+          format: date-time
+          description: When the annotation record was created
+      required:
+        - id
+        - inputText
+        - resultJson
+        - createdAt
+
+    Phase:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [pending, in-progress, complete]
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        order:
+          type: integer
+      required:
+        - id
+        - name
+        - description
+        - status
+        - progress
+        - order
+
+    Repository:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        status:
+          type: string
+          enum: [pending, active, warning, error]
+        isPrivate:
+          type: boolean
+      required:
+        - id
+        - name
+        - status
+        - isPrivate
+
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        status:
+          type: string
+          enum: [healthy, warning, error]
+        lastCheck:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - status
+        - lastCheck
+
+    Activity:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        type:
+          type: string
+          enum: [info, success, warning, error]
+      required:
+        - id
+        - title
+        - timestamp
+        - type
+
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: integer
+        fromAgent:
+          type: string
+        toAgent:
+          type: string
+        description:
+          type: string
+        artifact:
+          type: string
+        status:
+          type: string
+          enum: [pending, active, complete]
+      required:
+        - id
+        - fromAgent
+        - toAgent
+        - description
+        - artifact
+        - status
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+      required:
+        - message
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - ApiKeyAuth: []
