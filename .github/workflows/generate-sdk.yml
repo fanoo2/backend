@@ -19,7 +19,7 @@ jobs:
       - name: Checkout frontend
         uses: actions/checkout@v3
         with:
-          repository: your-org/frontend
+          repository: fanoo2/frontend
           path: frontend
           token: ${{ secrets.GITHUB_TOKEN }}
 
