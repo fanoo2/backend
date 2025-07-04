@@ -1,0 +1,43 @@
+name: Generate Frontend SDK
+
+on:
+  push:
+    paths:
+      - openapi.yaml
+
+jobs:
+  codegen:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # to push back to frontend repo
+    steps:
+      - name: Checkout backend (with openapi.yaml)
+        uses: actions/checkout@v3
+        with:
+          path: backend
+
+      - name: Checkout frontend
+        uses: actions/checkout@v3
+        with:
+          repository: your-org/frontend
+          path: frontend
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up OpenAPI Generator
+        run: npm install @openapitools/openapi-generator-cli -g
+
+      - name: Generate SDK
+        run: |
+          openapi-generator-cli generate \
+            -i backend/openapi.yaml \
+            -g typescript-fetch \
+            -o frontend/src/sdk
+
+      - name: Commit & Push SDK
+        run: |
+          cd frontend
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/sdk
+          git commit -m "chore: regenerate SDK from openapi.yaml" || echo "No changes"
+          git push
