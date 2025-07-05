@@ -31,11 +31,9 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    host: '0.0.0.0',
-    allowedHosts: ['all', '.replit.dev'],
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://0.0.0.0:5000',
         changeOrigin: true,
       },
     },
