@@ -5,10 +5,13 @@ import { registerRoutes } from "./routes";
 
 const app = express();
 
-const FRONTEND_URL = 'https://20cb041c-29ee-4ed6-9fb7-89e207c36447-00-34lt6eadu20q9.kirk.replit.dev/';
+const FRONTEND_URL = 'https://20cb041c-29ee-4ed6-9fb7-89e207c36447-00-34lt6eadu20q9.kirk.replit.dev';
 
 app.use(cors({
   origin: FRONTEND_URL,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
