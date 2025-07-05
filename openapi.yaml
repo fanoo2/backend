@@ -6,6 +6,7 @@ info:
   contact:
     name: Fanno Platform Team
     email: api@fanno.com
+
 servers:
   - url: https://api.fanno.com/v1
     description: Production server
@@ -56,6 +57,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
   /health:
     get:
       summary: Health check endpoint
@@ -130,7 +132,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
     patch:
       summary: Update agent configuration
       operationId: updateAgent
@@ -311,7 +312,7 @@ paths:
 
 components:
   schemas:
-      CreateSessionRequest:
+    CreateSessionRequest:
       type: object
       properties:
         amount:
@@ -345,6 +346,7 @@ components:
         - id
         - type
         - data
+
     HealthResponse:
       type: object
       properties:
