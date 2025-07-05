@@ -1,8 +1,16 @@
 
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 
 const app = express();
+
+const FRONTEND_URL = 'https://20cb041c-29ee-4ed6-9fb7-89e207c36447-00-34lt6eadu20q9.kirk.replit.dev/';
+
+app.use(cors({
+  origin: FRONTEND_URL,
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
