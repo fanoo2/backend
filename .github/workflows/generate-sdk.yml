@@ -21,7 +21,7 @@ jobs:
         with:
           repository: fanoo2/frontend
           path: frontend
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.FRONTEND_PAT }}
 
       - name: Set up OpenAPI Generator
         run: npm install @openapitools/openapi-generator-cli -g
