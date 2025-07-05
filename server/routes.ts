@@ -5,6 +5,70 @@ import { storage } from "./storage";
 import { annotate, annotateTextWithAI, generateBasicAnnotations } from "./annotator";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Root route - serves a welcome page
+  app.get("/", (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Fanno AI Platform API</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+            .container { max-width: 800px; margin: 0 auto; }
+            .endpoint { background: #f4f4f4; padding: 10px; margin: 10px 0; border-radius: 5px; }
+            .method { font-weight: bold; color: #007acc; }
+            h1 { color: #333; }
+            h2 { color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>🤖 Fanno AI Platform API</h1>
+            <p>Welcome to the Fanno AI Platform API server. This service provides AI-powered text annotation and analysis capabilities.</p>
+            
+            <h2>Available Endpoints</h2>
+            
+            <div class="endpoint">
+              <span class="method">GET</span> <code>/health</code> - Health check
+            </div>
+            
+            <div class="endpoint">
+              <span class="method">POST</span> <code>/api/annotate</code> - Annotate text with AI analysis
+              <br><small>Body: {"text": "your text here"}</small>
+            </div>
+            
+            <div class="endpoint">
+              <span class="method">POST</span> <code>/api/annotate-simple</code> - Simple text annotation
+              <br><small>Body: {"text": "your text here"}</small>
+            </div>
+            
+            <div class="endpoint">
+              <span class="method">GET</span> <code>/api/annotations</code> - Get recent annotations
+            </div>
+            
+            <div class="endpoint">
+              <span class="method">GET</span> <code>/api/stats</code> - Get platform statistics
+            </div>
+            
+            <div class="endpoint">
+              <span class="method">GET</span> <code>/api/agents</code> - Get all agents
+            </div>
+            
+            <div class="endpoint">
+              <span class="method">GET</span> <code>/api/workflows</code> - Get all workflows
+            </div>
+            
+            <div class="endpoint">
+              <span class="method">GET</span> <code>/api/activities</code> - Get recent activities
+            </div>
+            
+            <p><strong>Status:</strong> Service is running and ready to accept requests.</p>
+          </div>
+        </body>
+      </html>
+    `);
+  });
+
   // Health check endpoint (must be before catch-all)
   app.get("/health", (req, res) => {
     res.status(200).json({ 
