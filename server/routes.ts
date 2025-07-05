@@ -5,23 +5,6 @@ import { storage } from "./storage";
 import { annotate, annotateTextWithAI, generateBasicAnnotations } from "./annotator";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Add a root route handler
-  app.get("/", (req, res) => {
-    res.json({ message: "Server is running", status: "ok" });
-  });
-
-  // Add health check endpoint
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "healthy", timestamp: new Date().toISOString() });
-  });
-
-  // Add your other API routes here
-  // Example: app.get("/api/annotations", async (req, res) => { ... });
-
-  return createServer(app);
-}
-
-export async function registerRoutes(app: Express): Promise<Server> {
   // Root route - serves a welcome page
   app.get("/", (req, res) => {
     res.send(`
