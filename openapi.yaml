@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Fanno Platform API
   description: AI-driven platform automation API for agent orchestration
-  version: 1.0.0
+  version: 1.0.1
   contact:
     name: Fanno Platform Team
     email: api@fanno.com
