@@ -9,7 +9,7 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   extends: [
     'eslint:recommended',
-    '@typescript-eslint/recommended',    // TypeScript rules without type-checking
+    'plugin:@typescript-eslint/recommended',    // TypeScript rules without type-checking
   ],
   env: {
     node: true,
