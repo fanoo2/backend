@@ -3,14 +3,13 @@ module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: './tsconfig.json',    // point to your TS config
-    tsconfigRootDir: __dirname,
     sourceType: 'module',
+    ecmaVersion: 2021,
   },
   plugins: ['@typescript-eslint'],
   extends: [
     'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',    // TypeScript rules
+    '@typescript-eslint/recommended',    // TypeScript rules without type-checking
   ],
   env: {
     node: true,
