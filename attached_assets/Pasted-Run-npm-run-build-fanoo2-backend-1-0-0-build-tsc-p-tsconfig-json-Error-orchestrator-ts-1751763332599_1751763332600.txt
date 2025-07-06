@@ -1,0 +1,25 @@
+Run npm run build
+
+> @fanoo2/backend@1.0.0 build
+> tsc -p tsconfig.json
+
+Error: orchestrator.ts(4,19): error TS2307: Cannot find module 'axios' or its corresponding type declarations.
+Error: orchestrator.ts(5,25): error TS2307: Cannot find module '@octokit/rest' or its corresponding type declarations.
+Error: server/storage.ts(5,8): error TS2307: Cannot find module '@shared/schema' or its corresponding type declarations.
+Error: shared/schema.ts(89,34): error TS2344: Type 'ZodObject<{ username: ZodString; password: ZodString; }, { out: {}; in: {}; }>' does not satisfy the constraint 'ZodType<any, any, any>'.
+  Type 'ZodObject<{ username: ZodString; password: ZodString; }, { out: {}; in: {}; }>' is missing the following properties from type 'ZodType<any, any, any>': _type, _parse, _getType, _getOrReturnCtx, and 7 more.
+Error: shared/schema.ts(90,35): error TS2344: Type 'ZodObject<{ name: ZodString; type: ZodString; description: ZodString; status: ZodOptional<ZodString>; config: ZodOptional<ZodType<any, unknown, $ZodTypeInternals<any, unknown>>>; emoji: ZodString; provider: ZodString; }, { ...; }>' does not satisfy the constraint 'ZodType<any, any, any>'.
+  Type 'ZodObject<{ name: ZodString; type: ZodString; description: ZodString; status: ZodOptional<ZodString>; config: ZodOptional<ZodType<any, unknown, $ZodTypeInternals<any, unknown>>>; emoji: ZodString; provider: ZodString; }, { ...; }>' is missing the following properties from type 'ZodType<any, any, any>': _type, _parse, _getType, _getOrReturnCtx, and 7 more.
+Error: shared/schema.ts(91,35): error TS2344: Type 'ZodObject<{ name: ZodString; description: ZodString; status: ZodOptional<ZodString>; progress: ZodOptional<ZodInt>; order: ZodInt; }, { ...; }>' does not satisfy the constraint 'ZodType<any, any, any>'.
+  Type 'ZodObject<{ name: ZodString; description: ZodString; status: ZodOptional<ZodString>; progress: ZodOptional<ZodInt>; order: ZodInt; }, { ...; }>' is missing the following properties from type 'ZodType<any, any, any>': _type, _parse, _getType, _getOrReturnCtx, and 7 more.
+Error: shared/schema.ts(92,40): error TS2344: Type 'ZodObject<{ name: ZodString; status: ZodOptional<ZodString>; isPrivate: ZodOptional<ZodBoolean>; }, { out: {}; in: {}; }>' does not satisfy the constraint 'ZodType<any, any, any>'.
+  Type 'ZodObject<{ name: ZodString; status: ZodOptional<ZodString>; isPrivate: ZodOptional<ZodBoolean>; }, { out: {}; in: {}; }>' is missing the following properties from type 'ZodType<any, any, any>': _type, _parse, _getType, _getOrReturnCtx, and 7 more.
+Error: shared/schema.ts(93,37): error TS2344: Type 'ZodObject<{ name: ZodString; status: ZodOptional<ZodString>; }, { out: {}; in: {}; }>' does not satisfy the constraint 'ZodType<any, any, any>'.
+  Type 'ZodObject<{ name: ZodString; status: ZodOptional<ZodString>; }, { out: {}; in: {}; }>' is missing the following properties from type 'ZodType<any, any, any>': _type, _parse, _getType, _getOrReturnCtx, and 7 more.
+Error: shared/schema.ts(94,38): error TS2344: Type 'ZodObject<{ type: ZodOptional<ZodString>; title: ZodString; }, { out: {}; in: {}; }>' does not satisfy the constraint 'ZodType<any, any, any>'.
+  Type 'ZodObject<{ type: ZodOptional<ZodString>; title: ZodString; }, { out: {}; in: {}; }>' is missing the following properties from type 'ZodType<any, any, any>': _type, _parse, _getType, _getOrReturnCtx, and 7 more.
+Error: shared/schema.ts(95,38): error TS2344: Type 'ZodObject<{ description: ZodString; status: ZodOptional<ZodString>; fromAgent: ZodString; toAgent: ZodString; artifact: ZodString; }, { ...; }>' does not satisfy the constraint 'ZodType<any, any, any>'.
+  Type 'ZodObject<{ description: ZodString; status: ZodOptional<ZodString>; fromAgent: ZodString; toAgent: ZodString; artifact: ZodString; }, { ...; }>' is missing the following properties from type 'ZodType<any, any, any>': _type, _parse, _getType, _getOrReturnCtx, and 7 more.
+Error: shared/schema.ts(96,40): error TS2344: Type 'ZodObject<{ inputText: ZodString; resultJson: ZodType<any, unknown, $ZodTypeInternals<any, unknown>>; }, { out: {}; in: {}; }>' does not satisfy the constraint 'ZodType<any, any, any>'.
+  Type 'ZodObject<{ inputText: ZodString; resultJson: ZodType<any, unknown, $ZodTypeInternals<any, unknown>>; }, { out: {}; in: {}; }>' is missing the following properties from type 'ZodType<any, any, any>': _type, _parse, _getType, _getOrReturnCtx, and 7 more.
+Error: Process completed with exit code 1.
