@@ -108,7 +108,7 @@ Keep annotations concise but informative. Focus on actionable insights.`
     }
 
     const parsed = JSON.parse(result);
-    
+
     if (!parsed.annotations || !Array.isArray(parsed.annotations)) {
       throw new Error("Invalid response format from OpenAI");
     }
@@ -126,11 +126,11 @@ Keep annotations concise but informative. Focus on actionable insights.`
       }
       throw new Error(`OpenAI API error: ${error.message}`);
     }
-    
+
     if (error instanceof SyntaxError) {
       throw new Error("Failed to parse OpenAI response");
     }
-    
+
     throw error;
   }
 }
@@ -141,52 +141,52 @@ Keep annotations concise but informative. Focus on actionable insights.`
  */
 export function generateBasicAnnotations(text: string): string[] {
   const annotations: string[] = [];
-  
+
   // Basic text metrics
   const wordCount = text.split(/\s+/).length;
   const sentenceCount = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
   const avgWordsPerSentence = Math.round(wordCount / sentenceCount);
-  
+
   annotations.push(`Text contains ${wordCount} words across ${sentenceCount} sentences`);
-  
+
   if (avgWordsPerSentence > 20) {
     annotations.push("Complex sentence structure detected - consider breaking into shorter sentences");
   } else if (avgWordsPerSentence < 10) {
     annotations.push("Simple sentence structure - good for readability");
   }
-  
+
   // Technical keyword detection
   const technicalTerms = [
     'API', 'SDK', 'OpenAPI', 'microservice', 'database', 'authentication', 'authorization',
     'JWT', 'OAuth', 'REST', 'GraphQL', 'docker', 'kubernetes', 'cloud', 'deployment',
     'typescript', 'javascript', 'react', 'node', 'express', 'webhook', 'endpoint'
   ];
-  
+
   const foundTerms = technicalTerms.filter(term => 
     text.toLowerCase().includes(term.toLowerCase())
   );
-  
+
   if (foundTerms.length > 0) {
     annotations.push(`Technical concepts identified: ${foundTerms.join(', ')}`);
   }
-  
+
   // Platform-specific terms
   const fannoTerms = ['agent', 'workflow', 'automation', 'AI', 'platform', 'orchestration', 'integration'];
   const foundFannoTerms = fannoTerms.filter(term =>
     text.toLowerCase().includes(term.toLowerCase())
   );
-  
+
   if (foundFannoTerms.length > 0) {
     annotations.push(`Platform-related content detected: ${foundFannoTerms.join(', ')}`);
   }
-  
+
   // Basic sentiment analysis
   const positiveWords = ['good', 'great', 'excellent', 'amazing', 'perfect', 'successful', 'efficient'];
   const negativeWords = ['bad', 'terrible', 'awful', 'failed', 'error', 'broken', 'issue'];
-  
+
   const positiveCount = positiveWords.filter(word => text.toLowerCase().includes(word)).length;
   const negativeCount = negativeWords.filter(word => text.toLowerCase().includes(word)).length;
-  
+
   if (positiveCount > negativeCount) {
     annotations.push("Positive tone detected");
   } else if (negativeCount > positiveCount) {
@@ -194,14 +194,14 @@ export function generateBasicAnnotations(text: string): string[] {
   } else {
     annotations.push("Neutral tone");
   }
-  
+
   // Action items detection
   const actionWords = ['should', 'must', 'need to', 'required', 'implement', 'create', 'build', 'deploy'];
   const foundActions = actionWords.filter(word => text.toLowerCase().includes(word.toLowerCase()));
-  
+
   if (foundActions.length > 0) {
     annotations.push("Action items or requirements identified");
   }
-  
+
   return annotations;
 }
