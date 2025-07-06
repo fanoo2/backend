@@ -13,7 +13,11 @@
     "forceConsistentCasingInFileNames": true,
     "allowJs": false,
     "noImplicitAny": false,
-    "noEmitOnError": true
+    "noEmitOnError": true,
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["shared/*"]
+    }
   },
   "include": [
     "index.ts",
