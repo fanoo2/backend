@@ -14,7 +14,7 @@
     "forceConsistentCasingInFileNames": true,
     "allowJs": false,
     "noImplicitAny": false,
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["shared/*"]
