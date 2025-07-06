@@ -1,8 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 // Schema imports removed - not currently used in routes
-import { annotate, annotateTextWithAI, generateBasicAnnotations } from "./annotator";
+import { annotate, annotateTextWithAI, generateBasicAnnotations } from "./annotator.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Root route - serves a welcome page

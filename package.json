@@ -2,6 +2,7 @@
   "name": "@fanoo2/backend",
   "version": "1.0.0",
   "description": "AI Annotation Backend",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx index.ts",
