@@ -1,0 +1,52 @@
+
+[
+  {
+    "name": "UI/UX Designer",
+    "type": "ui-ux",
+    "tool": "Figma AI + Uizard",
+    "prompt": "Design a livestream homepage with video player, chat sidebar, nav bar, and responsive layout for mobile and desktop",
+    "output": "npm:@org/design-system"
+  },
+  {
+    "name": "WebRTC Engineer",
+    "type": "webrtc",
+    "tool": "LiveKit CLI / Agora AI SDK",
+    "prompt": "Implement real-time video streaming infrastructure with TURN/STUN servers, SFU cluster configuration, and JWT authentication",
+    "output": "docker:webrtc-service"
+  },
+  {
+    "name": "Backend Developer",
+    "type": "backend",
+    "tool": "Copilot + OpenAI Functions",
+    "prompt": "Implement Auth, stream-metadata, and webhook endpoints per OpenAPI spec with database integration and Kafka message broker",
+    "output": "docker:backend-api"
+  },
+  {
+    "name": "Frontend Developer",
+    "type": "frontend",
+    "tool": "Locofy.ai + Mutable AI",
+    "prompt": "Generate React pages consuming the design system, WebRTC client, and payment SDK with chat functionality and live preview features",
+    "output": "src/pages/**.tsx"
+  },
+  {
+    "name": "Payment Specialist",
+    "type": "payment",
+    "tool": "Stripe IQ + Plaid Link AI",
+    "prompt": "Scaffold payments microservice with /create-session and /webhook endpoints, supporting USD currency with $100 payout threshold",
+    "output": "npm:@fanno/payments-workspace"
+  },
+  {
+    "name": "Moderation Agent",
+    "type": "moderation",
+    "tool": "OpenAI + Perspective API",
+    "prompt": "Implement content moderation system with toxicity detection (threshold 0.8) and adult content filtering (threshold 0.7)",
+    "output": "npm:@fanno/moderation-service"
+  },
+  {
+    "name": "DevOps Engineer",
+    "type": "devops",
+    "tool": "Harness.io AI + Humanitec",
+    "prompt": "Set up CI/CD pipeline with Kubernetes deployment, cloud account integration, and vault secret management",
+    "output": "k8s:deployment-manifests"
+  }
+]
