@@ -1,0 +1,45 @@
+Run npm run test
+
+> @fanoo2/backend@1.0.0 test
+> npm run build && node -r tsconfig-paths/register dist/index.js --health
+
+
+> @fanoo2/backend@1.0.0 build
+> tsc -p tsconfig.json 2>&1 | tee tsc-errors.log || true
+
+Error: server/index.ts(2,8): error TS2300: Duplicate identifier 'express'.
+Error: server/index.ts(3,8): error TS2300: Duplicate identifier 'cors'.
+Error: server/index.ts(4,10): error TS2300: Duplicate identifier 'registerRoutes'.
+Error: server/index.ts(6,7): error TS2451: Cannot redeclare block-scoped variable 'app'.
+Error: server/index.ts(78,8): error TS2300: Duplicate identifier 'express'.
+Error: server/index.ts(79,8): error TS2300: Duplicate identifier 'cors'.
+Error: server/index.ts(80,10): error TS2300: Duplicate identifier 'registerRoutes'.
+Error: server/index.ts(82,7): error TS2451: Cannot redeclare block-scoped variable 'app'.
+Error: server/index.ts(104,12): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(port: number, hostname: string, backlog: number, callback?: (() => void) | undefined): Server<typeof IncomingMessage, typeof ServerResponse>', gave the following error.
+    Argument of type 'string | 5000' is not assignable to parameter of type 'number'.
+      Type 'string' is not assignable to type 'number'.
+  Overload 2 of 6, '(port: number, hostname: string, callback?: (() => void) | undefined): Server<typeof IncomingMessage, typeof ServerResponse>', gave the following error.
+    Argument of type 'string | 5000' is not assignable to parameter of type 'number'.
+      Type 'string' is not assignable to type 'number'.
+Error: server/storage.ts(332,23): error TS18047: 'b.timestamp' is possibly 'null'.
+Error: server/storage.ts(332,47): error TS18047: 'a.timestamp' is possibly 'null'.
+node:internal/modules/esm/resolve:275
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/runner/work/backend/backend/dist/server/index' imported from /home/runner/work/backend/backend/dist/index.js
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:860:10)
+    at defaultResolve (node:internal/modules/esm/resolve:984:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:780:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:704:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:687:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:305:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:175:49) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///home/runner/work/backend/backend/dist/server/index'
+}
+
+Node.js v22.17.0
+Error: Process completed with exit code 1.
