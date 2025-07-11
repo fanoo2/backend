@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
 // Schema imports removed - not currently used in routes
 import { annotate, annotateTextWithAI, generateBasicAnnotations } from "./annotator.js";
+import axios from "axios";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Root route - serves a welcome page
@@ -279,6 +280,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(annotations);
     } catch (_error) {
       res.status(500).json({ message: "Failed to fetch annotations" });
+    }
+  });
+
+  // Agent events endpoint for orchestrator
+  app.post("/agent-events", async (req, res) => {
+    try {
+      const { agent, status, version } = req.body;
+      
+      if (!agent || !status) {
+        return res.status(400).json({ message: "Agent and status are required" });
+      }
+
+      // Only process completed events
+      if (status !== 'completed') {
+        return res.sendStatus(204);
+      }
+
+      // Only trigger frontend when payment is done
+      if (agent === 'payment-specialist') {
+        const ghToken = process.env.GH_ACTIONS_TOKEN;
+        
+        if (!ghToken) {
+          console.warn("GH_ACTIONS_TOKEN not found, skipping GitHub workflow dispatch");
+          return res.sendStatus(200);
+        }
+
+        try {
+          await axios.post(
+            'https://api.github.com/repos/YOUR-ORG/frontend/actions/workflows/run-frontend-agent.yml/dispatches',
+            {
+              ref: 'main',
+              inputs: { sdk_version: version || 'latest' }
+            },
+            {
+              headers: {
+                'Authorization': `Bearer ${ghToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+          
+          console.log(`GitHub workflow dispatched for payment-specialist completion`);
+        } catch (githubError) {
+          console.error("Failed to dispatch GitHub workflow:", githubError instanceof Error ? githubError.message : "Unknown error");
+          // Don't fail the request if GitHub call fails
+        }
+      }
+
+      res.sendStatus(200);
+    } catch (error) {
+      console.error("Agent events error:", error instanceof Error ? error.message : "Unknown error");
+      res.status(500).json({ message: "Failed to process agent event" });
     }
   });
 
