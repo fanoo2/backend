@@ -329,7 +329,7 @@ export class MemStorage implements IStorage {
 
   async getRecentActivities(limit = 10): Promise<Activity[]> {
     return Array.from(this.activities.values())
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .sort((a, b) => (b.timestamp?.getTime() || 0) - (a.timestamp?.getTime() || 0))
       .slice(0, limit);
   }
 
