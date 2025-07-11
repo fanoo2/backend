@@ -14,9 +14,9 @@ interface AgentConfig {
   output: string;
 }
 
-const agents: AgentConfig[] = JSON.parse(
+const agents = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, 'agents.json'), 'utf-8')
-);
+).agents;
 
 async function invokeAgent(agent: AgentConfig) {
   console.log(`▶️ Invoking ${agent.name} with ${agent.tool}`);
