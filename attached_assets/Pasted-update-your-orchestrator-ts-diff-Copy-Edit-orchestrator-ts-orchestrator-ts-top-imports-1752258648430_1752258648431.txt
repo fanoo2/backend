@@ -1,0 +1,82 @@
+update your orchestrator.ts:
+
+diff
+Copy
+Edit
+--- orchestrator.ts
++++ orchestrator.ts
+@@ top (imports)
+-import type { AgentConfig } from './agent-config'
++import type { AgentConfig } from './agent-config'
+ import { runUIUXDesigner, runWebRTCEngineer, /* … etc … */ } from './agents'
++import fs from 'fs'
++import path from 'path'
+
+@@ where your hard-coded agent list lives
+-// Hard-coded agents array
+-const agents: AgentConfig[] = [
+-  { id: 'uiux-designer',    name: 'UI/UX Designer',     tool: 'FigmaAI+Uizard',     output: 'npm:@org/design-system' },
+-  { id: 'webrtc-engineer',  name: 'WebRTC Engineer',   tool: 'LiveKitCLI+AgoraAI',  output: 'docker:webrtc-service' },
+-  /* … etc … */
+-]
++// Load agents from agents.json
++const agentsFile = path.resolve(__dirname, 'agents.json')
++const agentsJson = fs.readFileSync(agentsFile, 'utf-8')
++const agents: AgentConfig[] = JSON.parse(agentsJson).agents
+
+@@ in your main orchestration function
+- for (const agent of agents) {
+-   switch (agent.id) {
+-     case 'uiux-designer':
+-       await runUIUXDesigner(agent)
+-       break
+-     case 'webrtc-engineer':
+-       await runWebRTCEngineer(agent)
+-       break
+-     /* … etc … */
+-   }
+-}
++for (const agent of agents) {
++  console.log(`▶️ Invoking ${agent.name} using ${agent.tool}`)
++  switch (agent.id) {
++    case 'uiux-designer':
++      await runUIUXDesigner(agent)
++      break
++    case 'webrtc-engineer':
++      await runWebRTCEngineer(agent)
++      break
++    case 'backend-developer':
++      await runBackendDeveloper(agent)
++      break
++    case 'frontend-developer':
++      await runFrontendDeveloper(agent)
++      break
++    case 'payment-specialist':
++      await runPaymentSpecialist(agent)
++      break
++    case 'moderation-agent':
++      await runModerationAgent(agent)
++      break
++    case 'devops-engineer':
++      await runDevOpsEngineer(agent)
++      break
++    default:
++      console.warn(`⚠️ Unknown agent id: ${agent.id}`)
++  }
++  console.log(`✅ ${agent.name} completed, output: ${agent.output}`)
++}
+Steps to apply:
+Commit your agents.json to the root of the backend repo (next to orchestrator.ts).
+
+Edit orchestrator.ts with the diff above, replacing the hard-coded list with dynamic loading.
+
+Ensure AgentConfig in agent-config.ts matches the JSON shape (id, name, tool, output).
+
+Run:
+
+bash
+Copy
+Edit
+npm run orchestrate
+You should see your console logs driven by the JSON file.
+
