@@ -1,7 +1,7 @@
 import { createServer } from "http";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 // Schema imports removed - not currently used in routes
-import { annotate, annotateTextWithAI, generateBasicAnnotations } from "./annotator";
+import { annotate, annotateTextWithAI, generateBasicAnnotations } from "./annotator.js";
 export async function registerRoutes(app) {
     // Root route - serves a welcome page
     app.get("/", (req, res) => {
@@ -274,3 +274,4 @@ export async function registerRoutes(app) {
     const httpServer = createServer(app);
     return httpServer;
 }
+//# sourceMappingURL=routes.js.map

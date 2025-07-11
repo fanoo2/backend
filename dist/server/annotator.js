@@ -178,3 +178,4 @@ export function generateBasicAnnotations(text) {
     }
     return annotations;
 }
+//# sourceMappingURL=annotator.js.map

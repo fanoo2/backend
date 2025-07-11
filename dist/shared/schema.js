@@ -65,3 +65,4 @@ export const insertServiceSchema = createInsertSchema(services).omit({ id: true,
 export const insertActivitySchema = createInsertSchema(activities).omit({ id: true, timestamp: true });
 export const insertWorkflowSchema = createInsertSchema(workflows).omit({ id: true });
 export const insertAnnotationSchema = createInsertSchema(annotations).omit({ id: true, createdAt: true });
+//# sourceMappingURL=schema.js.map

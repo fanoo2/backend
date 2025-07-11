@@ -1,14 +1,14 @@
 export class MemStorage {
+    users = new Map();
+    agents = new Map();
+    phases = new Map();
+    repositories = new Map();
+    services = new Map();
+    activities = new Map();
+    workflows = new Map();
+    annotations = new Map();
+    currentId = 1;
     constructor() {
-        this.users = new Map();
-        this.agents = new Map();
-        this.phases = new Map();
-        this.repositories = new Map();
-        this.services = new Map();
-        this.activities = new Map();
-        this.workflows = new Map();
-        this.annotations = new Map();
-        this.currentId = 1;
         this.initializeData();
     }
     initializeData() {
@@ -256,7 +256,7 @@ export class MemStorage {
     }
     async getRecentActivities(limit = 10) {
         return Array.from(this.activities.values())
-            .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+            .sort((a, b) => (b.timestamp?.getTime() || 0) - (a.timestamp?.getTime() || 0))
             .slice(0, limit);
     }
     async createActivity(activity) {
@@ -302,3 +302,4 @@ export class MemStorage {
     }
 }
 export const storage = new MemStorage();
+//# sourceMappingURL=storage.js.map
