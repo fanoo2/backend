@@ -282,7 +282,7 @@ export class MemStorage implements IStorage {
   async updateAgent(id: number, updates: Partial<InsertAgent>): Promise<Agent | undefined> {
     const agent = this.agents.get(id);
     if (!agent) return undefined;
-    
+
     const updatedAgent = { ...agent, ...updates, lastUpdated: new Date() };
     this.agents.set(id, updatedAgent);
     return updatedAgent;
@@ -295,7 +295,7 @@ export class MemStorage implements IStorage {
   async updatePhase(id: number, updates: Partial<InsertPhase>): Promise<Phase | undefined> {
     const phase = this.phases.get(id);
     if (!phase) return undefined;
-    
+
     const updatedPhase = { ...phase, ...updates };
     this.phases.set(id, updatedPhase);
     return updatedPhase;
@@ -308,7 +308,7 @@ export class MemStorage implements IStorage {
   async updateRepository(id: number, updates: Partial<InsertRepository>): Promise<Repository | undefined> {
     const repo = this.repositories.get(id);
     if (!repo) return undefined;
-    
+
     const updatedRepo = { ...repo, ...updates };
     this.repositories.set(id, updatedRepo);
     return updatedRepo;
@@ -321,7 +321,7 @@ export class MemStorage implements IStorage {
   async updateService(id: number, updates: Partial<InsertService>): Promise<Service | undefined> {
     const service = this.services.get(id);
     if (!service) return undefined;
-    
+
     const updatedService = { ...service, ...updates, lastCheck: new Date() };
     this.services.set(id, updatedService);
     return updatedService;
@@ -347,7 +347,7 @@ export class MemStorage implements IStorage {
   async updateWorkflow(id: number, updates: Partial<InsertWorkflow>): Promise<Workflow | undefined> {
     const workflow = this.workflows.get(id);
     if (!workflow) return undefined;
-    
+
     const updatedWorkflow = { ...workflow, ...updates };
     this.workflows.set(id, updatedWorkflow);
     return updatedWorkflow;
@@ -373,12 +373,12 @@ export class MemStorage implements IStorage {
   async getStats(): Promise<{ activeAgents: number; completedTasks: number; progress: number }> {
     const agents = Array.from(this.agents.values());
     const phases = Array.from(this.phases.values());
-    
+
     const activeAgents = agents.filter(agent => agent.status === 'active').length;
     const completedTasks = phases.reduce((sum, phase) => sum + Math.floor(phase.progress / 10), 0);
     const totalProgress = phases.reduce((sum, phase) => sum + phase.progress, 0);
     const progress = Math.round(totalProgress / phases.length);
-    
+
     return { activeAgents, completedTasks, progress };
   }
 }

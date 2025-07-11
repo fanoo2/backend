@@ -67,14 +67,14 @@ export const annotations = pgTable("annotations", {
 });
 
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({ id: true });
-export const insertAgentSchema = createInsertSchema(agents).omit({ id: true, lastUpdated: true });
-export const insertPhaseSchema = createInsertSchema(phases).omit({ id: true });
-export const insertRepositorySchema = createInsertSchema(repositories).omit({ id: true });
-export const insertServiceSchema = createInsertSchema(services).omit({ id: true, lastCheck: true });
-export const insertActivitySchema = createInsertSchema(activities).omit({ id: true, timestamp: true });
-export const insertWorkflowSchema = createInsertSchema(workflows).omit({ id: true });
-export const insertAnnotationSchema = createInsertSchema(annotations).omit({ id: true, createdAt: true });
+export const insertUserSchema = createInsertSchema(users).omit({ id: true }) as any;
+export const insertAgentSchema = createInsertSchema(agents).omit({ id: true, lastUpdated: true }) as any;
+export const insertPhaseSchema = createInsertSchema(phases).omit({ id: true }) as any;
+export const insertRepositorySchema = createInsertSchema(repositories).omit({ id: true }) as any;
+export const insertServiceSchema = createInsertSchema(services).omit({ id: true, lastCheck: true }) as any;
+export const insertActivitySchema = createInsertSchema(activities).omit({ id: true, timestamp: true }) as any;
+export const insertWorkflowSchema = createInsertSchema(workflows).omit({ id: true }) as any;
+export const insertAnnotationSchema = createInsertSchema(annotations).omit({ id: true, createdAt: true }) as any;
 
 // Types
 export type User = typeof users.$inferSelect;

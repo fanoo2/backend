@@ -14,8 +14,11 @@
   },
   "dependencies": {
     "@octokit/rest": "^22.0.0",
+    "@replit/vite-plugin-cartographer": "^0.2.7",
+    "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@types/cors": "^2.8.19",
     "@types/node": "^24.0.10",
+    "@vitejs/plugin-react": "^4.6.0",
     "axios": "^1.10.0",
     "cors": "^2.8.5",
     "drizzle-kit": "^0.31.4",
