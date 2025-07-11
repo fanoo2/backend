@@ -1,8 +1,6 @@
 
 import fs from 'fs';
 import path from 'path';
-import axios from 'axios';
-import { Octokit } from '@octokit/rest';
 
 interface AgentConfig {
   name: string;
