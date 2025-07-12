@@ -354,7 +354,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     // Handle the event
     switch (event.type) {
-      case 'checkout.session.completed':
+      case 'checkout.session.completed': {
         const session = event.data.object;
         console.log('Payment succeeded:', session.id);
 
@@ -362,10 +362,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // You can access session.customer_email, session.amount_total, etc.
 
         break;
-      case 'payment_intent.payment_failed':
+      }
+      case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object;
         console.log('Payment failed:', paymentIntent.id);
         break;
+      }
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
