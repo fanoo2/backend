@@ -26,43 +26,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
           <div class="container">
             <h1>🤖 Fanno AI Platform API</h1>
             <p>Welcome to the Fanno AI Platform API server. This service provides AI-powered text annotation and analysis capabilities.</p>
-            
+
             <h2>Available Endpoints</h2>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/health</code> - Health check
             </div>
-            
+
             <div class="endpoint">
               <span class="method">POST</span> <code>/api/annotate</code> - Annotate text with AI analysis
               <br><small>Body: {"text": "your text here"}</small>
             </div>
-            
+
             <div class="endpoint">
               <span class="method">POST</span> <code>/api/annotate-simple</code> - Simple text annotation
               <br><small>Body: {"text": "your text here"}</small>
             </div>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/api/annotations</code> - Get recent annotations
             </div>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/api/stats</code> - Get platform statistics
             </div>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/api/agents</code> - Get all agents
             </div>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/api/workflows</code> - Get all workflows
             </div>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/api/activities</code> - Get recent activities
             </div>
-            
+
             <p><strong>Status:</strong> Service is running and ready to accept requests.</p>
           </div>
         </body>
@@ -211,7 +211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/annotate", async (req, res) => {
     try {
       const { text } = req.body;
-      
+
       if (!text || typeof text !== 'string') {
         return res.status(400).json({ 
           message: "Invalid request",
@@ -230,17 +230,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let annotations: string[];
       let analysisMethod = "openai";
-      
+
       try {
         // Try OpenAI first for advanced AI analysis
         annotations = await annotateTextWithAI(text);
       } catch (aiError) {
         console.warn("OpenAI annotation failed, falling back to basic analysis:", aiError instanceof Error ? aiError.message : "Unknown error");
-        
+
         // Fall back to basic annotations if OpenAI fails
         annotations = generateBasicAnnotations(text);
         analysisMethod = "basic";
-        
+
         // Add a note about the fallback
         annotations.unshift("Note: Using basic analysis (OpenAI unavailable)");
       }
@@ -261,7 +261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Don't fail the request if logging fails, just log the error
         console.error("Failed to log annotation to database:", dbError instanceof Error ? dbError.message : "Unknown error");
       }
-      
+
       res.json({ annotations });
     } catch (_error) {
       res.status(500).json({ 
@@ -287,7 +287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/payments/create-session", async (req, res) => {
     try {
       const { amount, currency } = req.body;
-      
+
       if (!amount || !currency) {
         return res.status(400).json({ 
           message: "Amount and currency are required" 
@@ -301,8 +301,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-      
+      const { default: Stripe } = await import('stripe');
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [{
@@ -343,7 +344,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     let event;
 
     try {
-      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+      const { default: Stripe } = await import('stripe');
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
       event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
     } catch (err) {
       console.error('Webhook signature verification failed:', err instanceof Error ? err.message : 'Unknown error');
@@ -355,10 +357,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       case 'checkout.session.completed':
         const session = event.data.object;
         console.log('Payment succeeded:', session.id);
-        
+
         // TODO: Fulfill the purchase, update database, send confirmation email, etc.
         // You can access session.customer_email, session.amount_total, etc.
-        
+
         break;
       case 'payment_intent.payment_failed':
         const paymentIntent = event.data.object;
@@ -375,7 +377,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/agent-events", async (req, res) => {
     try {
       const { agent, status, version } = req.body;
-      
+
       if (!agent || !status) {
         return res.status(400).json({ message: "Agent and status are required" });
       }
@@ -388,7 +390,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Only trigger frontend when payment is done
       if (agent === 'payment-specialist') {
         const ghToken = process.env.GH_ACTIONS_TOKEN;
-        
+
         if (!ghToken) {
           console.warn("GH_ACTIONS_TOKEN not found, skipping GitHub workflow dispatch");
           return res.sendStatus(200);
@@ -409,7 +411,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
             }
           );
-          
+
           console.log(`GitHub workflow dispatched for payment-specialist completion`);
         } catch (githubError) {
           console.error("Failed to dispatch GitHub workflow:", githubError instanceof Error ? githubError.message : "Unknown error");
