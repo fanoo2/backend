@@ -283,6 +283,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Stripe payments endpoint
+  app.post("/payments/create-session", async (req, res) => {
+    try {
+      const { amount, currency } = req.body;
+      
+      if (!amount || !currency) {
+        return res.status(400).json({ 
+          message: "Amount and currency are required" 
+        });
+      }
+
+      // TODO: Replace with actual Stripe integration
+      // const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+      // const session = await stripe.checkout.sessions.create({
+      //   payment_method_types: ['card'],
+      //   line_items: [{
+      //     price_data: {
+      //       currency: currency,
+      //       product_data: {
+      //         name: 'Fanno AI Platform Service',
+      //       },
+      //       unit_amount: amount,
+      //     },
+      //     quantity: 1,
+      //   }],
+      //   mode: 'payment',
+      //   success_url: `${process.env.FRONTEND_URL}/success`,
+      //   cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+      // });
+
+      // Mock response for now - replace with actual Stripe session
+      const mockSession = {
+        id: `cs_test_${Date.now()}`,
+        url: "https://checkout.stripe.com/pay/mock-session"
+      };
+
+      res.json({ sessionId: mockSession.id, url: mockSession.url });
+    } catch (error) {
+      console.error("Payment session creation failed:", error);
+      res.status(500).json({ 
+        message: "Failed to create payment session",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Agent events endpoint for orchestrator
   app.post("/agent-events", async (req, res) => {
     try {

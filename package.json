@@ -8,6 +8,7 @@
     "dev": "tsx index.ts",
     "build": "tsc -p tsconfig.json 2>&1 | tee tsc-errors.log || true",
     "start": "node -r tsconfig-paths/register dist/index.js",
+    "server": "tsx server/index.ts",
     "lint": "eslint . --ext .ts --config .eslintrc.cjs",
     "test": "npm run build && node -r tsconfig-paths/register dist/index.js --health",
     "orchestrate": "tsx orchestrator.ts"
