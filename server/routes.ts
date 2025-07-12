@@ -4,6 +4,7 @@ import { storage } from "./storage.js";
 // Schema imports removed - not currently used in routes
 import { annotate, annotateTextWithAI, generateBasicAnnotations } from "./annotator.js";
 import axios from "axios";
+import { AccessToken, RoomGrant } from 'livekit-server-sdk';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Root route - serves a welcome page
@@ -373,6 +374,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     res.json({ received: true });
+  });
+
+  // LiveKit token endpoint
+  app.post('/api/token', express.json(), (req, res) => {
+    const identity = req.body.identity || `guest_${Math.random()
+      .toString(36)
+      .substring(2)}`;
+    const at = new AccessToken(
+      process.env.LIVEKIT_API_KEY!,
+      process.env.LIVEKIT_API_SECRET!,
+      { ttl: 3600, identity }
+    );
+    at.addGrant({ roomJoin: true });
+    res.json({ token: at.toJwt() });
   });
 
   // Agent events endpoint for orchestrator
