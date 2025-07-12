@@ -302,7 +302,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { default: Stripe } = await import('stripe');
-      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -345,7 +345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const { default: Stripe } = await import('stripe');
-      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
       event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
     } catch (err) {
       console.error('Webhook signature verification failed:', err instanceof Error ? err.message : 'Unknown error');
