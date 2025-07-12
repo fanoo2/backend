@@ -294,32 +294,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // TODO: Replace with actual Stripe integration
-      // const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-      // const session = await stripe.checkout.sessions.create({
-      //   payment_method_types: ['card'],
-      //   line_items: [{
-      //     price_data: {
-      //       currency: currency,
-      //       product_data: {
-      //         name: 'Fanno AI Platform Service',
-      //       },
-      //       unit_amount: amount,
-      //     },
-      //     quantity: 1,
-      //   }],
-      //   mode: 'payment',
-      //   success_url: `${process.env.FRONTEND_URL}/success`,
-      //   cancel_url: `${process.env.FRONTEND_URL}/cancel`,
-      // });
+      if (!process.env.STRIPE_SECRET_KEY) {
+        return res.status(500).json({
+          message: "Stripe configuration missing",
+          error: "STRIPE_SECRET_KEY not configured"
+        });
+      }
 
-      // Mock response for now - replace with actual Stripe session
-      const mockSession = {
-        id: `cs_test_${Date.now()}`,
-        url: "https://checkout.stripe.com/pay/mock-session"
-      };
+      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+      
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: currency,
+            product_data: {
+              name: 'Fanno AI Platform Service',
+            },
+            unit_amount: amount,
+          },
+          quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/success`,
+        cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/cancel`,
+      });
 
-      res.json({ sessionId: mockSession.id, url: mockSession.url });
+      res.json({ sessionId: session.id, url: session.url });
     } catch (error) {
       console.error("Payment session creation failed:", error);
       res.status(500).json({ 
@@ -327,6 +328,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }
+  });
+
+  // Stripe webhook endpoint
+  app.post("/payments/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!endpointSecret) {
+      console.error('Stripe webhook secret not configured');
+      return res.status(500).send('Webhook secret not configured');
+    }
+
+    let event;
+
+    try {
+      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    } catch (err) {
+      console.error('Webhook signature verification failed:', err instanceof Error ? err.message : 'Unknown error');
+      return res.status(400).send(`Webhook Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+
+    // Handle the event
+    switch (event.type) {
+      case 'checkout.session.completed':
+        const session = event.data.object;
+        console.log('Payment succeeded:', session.id);
+        
+        // TODO: Fulfill the purchase, update database, send confirmation email, etc.
+        // You can access session.customer_email, session.amount_total, etc.
+        
+        break;
+      case 'payment_intent.payment_failed':
+        const paymentIntent = event.data.object;
+        console.log('Payment failed:', paymentIntent.id);
+        break;
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+
+    res.json({ received: true });
   });
 
   // Agent events endpoint for orchestrator
