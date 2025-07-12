@@ -33,7 +33,7 @@ jobs:
       - name: Run tests
         run: npm run test
         
-      - name: Run Orchestrator
-        run: npm run orchestrate
+      - name: Run Backend Server
+        run: npm run server
         env:
           NODE_ENV: production
