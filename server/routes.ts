@@ -391,7 +391,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ token: at.toJwt() });
   });
 
-  // LiveKit token endpoint (alternative path)
+  // LiveKit token endpoint
   app.post('/api/livekit/token', express.json(), async (req, res) => {
     const { identity, roomName } = req.body as {
       identity?: string;
@@ -400,31 +400,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     const apiKey = process.env.LIVEKIT_API_KEY;
     const apiSecret = process.env.LIVEKIT_API_SECRET;
-    const url = process.env.LIVEKIT_URL;
 
-    if (!apiKey || !apiSecret || !url) {
+    if (!apiKey || !apiSecret) {
       return res
         .status(500)
-        .json({ error: 'LiveKit URL/API key/secret must be set in env.' });
+        .json({ error: 'LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be set in secrets.' });
     }
 
-    // Generate a random guest identity if none provided
-    const userIdentity = identity ?? `guest-${randomUUID().slice(0, 8)}`;
+    // Generate a random identity if none provided
+    const userIdentity = identity ?? randomUUID();
 
     try {
-      // Build the AccessToken and add a room grant if requested
+      // Build the AccessToken with room grants
       const at = new AccessToken(apiKey, apiSecret, { identity: userIdentity });
-      if (roomName) {
-        at.addGrant({ room: roomName });
-      }
+      at.addGrant({ roomJoin: true, room: roomName });
 
       const token = at.toJwt();
 
       return res.json({
-        url,
-        token,
         identity: userIdentity,
-        roomName: roomName ?? null,
+        token,
+        roomName
       });
     } catch (err: any) {
       console.error('LiveKit token error:', err);
