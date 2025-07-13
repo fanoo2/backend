@@ -390,6 +390,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ token: at.toJwt() });
   });
 
+  // LiveKit token endpoint (alternative path)
+  app.post('/api/livekit/token', express.json(), (req, res) => {
+    try {
+      if (!process.env.LIVEKIT_API_KEY || !process.env.LIVEKIT_API_SECRET) {
+        return res.status(500).json({
+          message: "LiveKit configuration missing",
+          error: "LIVEKIT_API_KEY or LIVEKIT_API_SECRET not configured"
+        });
+      }
+
+      const { identity, roomName } = req.body;
+      const participantIdentity = identity || `guest_${Math.random()
+        .toString(36)
+        .substring(2)}`;
+
+      const at = new AccessToken(
+        process.env.LIVEKIT_API_KEY,
+        process.env.LIVEKIT_API_SECRET,
+        { ttl: 3600, identity: participantIdentity }
+      );
+
+      // Add room join grant
+      const roomGrant = new RoomGrant();
+      roomGrant.roomJoin = true;
+      roomGrant.canPublish = true;
+      roomGrant.canSubscribe = true;
+      
+      if (roomName) {
+        roomGrant.room = roomName;
+      }
+
+      at.addGrant(roomGrant);
+
+      res.json({ 
+        token: at.toJwt(),
+        identity: participantIdentity,
+        roomName: roomName || undefined
+      });
+    } catch (error) {
+      console.error("LiveKit token generation failed:", error);
+      res.status(500).json({
+        message: "Failed to generate LiveKit token",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Agent events endpoint for orchestrator
   app.post("/agent-events", async (req, res) => {
     try {
