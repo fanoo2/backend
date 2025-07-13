@@ -392,48 +392,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // LiveKit token endpoint (alternative path)
-  app.post('/api/livekit/token', express.json(), (req, res) => {
+  app.post('/api/livekit/token', express.json(), async (req, res) => {
+    const { identity, roomName } = req.body as {
+      identity?: string;
+      roomName?: string;
+    };
+
+    const apiKey = process.env.LIVEKIT_API_KEY;
+    const apiSecret = process.env.LIVEKIT_API_SECRET;
+    const url = process.env.LIVEKIT_URL;
+
+    if (!apiKey || !apiSecret || !url) {
+      return res
+        .status(500)
+        .json({ error: 'LiveKit URL/API key/secret must be set in env.' });
+    }
+
+    // Generate a random guest identity if none provided
+    const userIdentity = identity ?? `guest-${randomUUID().slice(0, 8)}`;
+
     try {
-      const apiKey = process.env.LIVEKIT_API_KEY;
-      const apiSecret = process.env.LIVEKIT_API_SECRET;
-      const url = process.env.LIVEKIT_URL;
-
-      if (!apiKey || !apiSecret || !url) {
-        return res.status(500).json({
-          error: "LiveKit credentials (URL/key/secret) are not set."
-        });
+      // Build the AccessToken and add a room grant if requested
+      const at = new AccessToken(apiKey, apiSecret, { identity: userIdentity });
+      if (roomName) {
+        at.addGrant({ room: roomName });
       }
-
-      const { identity, roomName } = req.body;
-      const userIdentity = identity || `guest-${randomUUID().slice(0, 8)}`;
-
-      // Create access token with room grant
-      const at = new AccessToken(apiKey, apiSecret, {
-        identity: userIdentity,
-        ttl: 3600
-      });
-
-      // Add room join grant using the grants object
-      at.addGrant({
-        roomJoin: true,
-        room: roomName,
-        canPublish: true,
-        canSubscribe: true
-      });
 
       const token = at.toJwt();
 
-      res.json({
+      return res.json({
+        url,
         token,
         identity: userIdentity,
-        roomName: roomName || null,
-        url
+        roomName: roomName ?? null,
       });
-    } catch (error) {
-      console.error("Error generating LiveKit token:", error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : "Token generation failed"
-      });
+    } catch (err: any) {
+      console.error('LiveKit token error:', err);
+      return res
+        .status(500)
+        .json({ error: err.message || 'Failed to generate LiveKit token' });
     }
   });
 
