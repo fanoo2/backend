@@ -402,10 +402,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const apiSecret = process.env.LIVEKIT_API_SECRET;
     const url = process.env.LIVEKIT_URL;
 
-    if (!apiKey || !apiSecret || !url) {
+    if (!apiKey || !apiSecret) {
       return res
         .status(500)
-        .json({ error: 'LIVEKIT_API_KEY, LIVEKIT_API_SECRET, and LIVEKIT_URL must be set in secrets.' });
+        .json({ error: 'LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be set.' });
     }
 
     // Generate a random identity if none provided
@@ -421,14 +421,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json({
         identity: userIdentity,
         token,
-        roomName,
-        url
+        url: url || 'wss://your-livekit-url.com',
+        roomName
       });
     } catch (err: any) {
       console.error('LiveKit token error:', err);
       return res
         .status(500)
-        .json({ error: err.message || 'Failed to generate LiveKit token' });
+        .json({ error: err?.message || 'Failed to generate LiveKit token' });
     }
   });
 
