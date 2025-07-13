@@ -4,7 +4,8 @@ import { storage } from "./storage.js";
 // Schema imports removed - not currently used in routes
 import { annotate, annotateTextWithAI, generateBasicAnnotations } from "./annotator.js";
 import axios from "axios";
-import { AccessToken, RoomGrant } from 'livekit-server-sdk';
+import { AccessToken } from 'livekit-server-sdk';
+import { randomUUID } from 'crypto';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Root route - serves a welcome page
@@ -393,46 +394,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // LiveKit token endpoint (alternative path)
   app.post('/api/livekit/token', express.json(), (req, res) => {
     try {
-      if (!process.env.LIVEKIT_API_KEY || !process.env.LIVEKIT_API_SECRET) {
+      const apiKey = process.env.LIVEKIT_API_KEY;
+      const apiSecret = process.env.LIVEKIT_API_SECRET;
+      const url = process.env.LIVEKIT_URL;
+
+      if (!apiKey || !apiSecret || !url) {
         return res.status(500).json({
-          message: "LiveKit configuration missing",
-          error: "LIVEKIT_API_KEY or LIVEKIT_API_SECRET not configured"
+          error: "LiveKit credentials (URL/key/secret) are not set."
         });
       }
 
       const { identity, roomName } = req.body;
-      const participantIdentity = identity || `guest_${Math.random()
-        .toString(36)
-        .substring(2)}`;
+      const userIdentity = identity || `guest-${randomUUID().slice(0, 8)}`;
 
-      const at = new AccessToken(
-        process.env.LIVEKIT_API_KEY,
-        process.env.LIVEKIT_API_SECRET,
-        { ttl: 3600, identity: participantIdentity }
-      );
+      // Create access token with room grant
+      const at = new AccessToken(apiKey, apiSecret, {
+        identity: userIdentity,
+        ttl: 3600
+      });
 
-      // Add room join grant
-      const roomGrant = new RoomGrant();
-      roomGrant.roomJoin = true;
-      roomGrant.canPublish = true;
-      roomGrant.canSubscribe = true;
-      
-      if (roomName) {
-        roomGrant.room = roomName;
-      }
+      // Add room join grant using the grants object
+      at.addGrant({
+        roomJoin: true,
+        room: roomName,
+        canPublish: true,
+        canSubscribe: true
+      });
 
-      at.addGrant(roomGrant);
+      const token = at.toJwt();
 
-      res.json({ 
-        token: at.toJwt(),
-        identity: participantIdentity,
-        roomName: roomName || undefined
+      res.json({
+        token,
+        identity: userIdentity,
+        roomName: roomName || null,
+        url
       });
     } catch (error) {
-      console.error("LiveKit token generation failed:", error);
+      console.error("Error generating LiveKit token:", error);
       res.status(500).json({
-        message: "Failed to generate LiveKit token",
-        error: error instanceof Error ? error.message : "Unknown error"
+        error: error instanceof Error ? error.message : "Token generation failed"
       });
     }
   });
