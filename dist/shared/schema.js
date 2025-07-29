@@ -1,5 +1,5 @@
 import { pgTable, text, serial, integer, boolean, jsonb, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
 export const users = pgTable("users", {
     id: serial("id").primaryKey(),
     username: text("username").notNull().unique(),
@@ -56,13 +56,19 @@ export const annotations = pgTable("annotations", {
     resultJson: jsonb("result_json").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-// Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({ id: true });
-export const insertAgentSchema = createInsertSchema(agents).omit({ id: true, lastUpdated: true });
-export const insertPhaseSchema = createInsertSchema(phases).omit({ id: true });
-export const insertRepositorySchema = createInsertSchema(repositories).omit({ id: true });
-export const insertServiceSchema = createInsertSchema(services).omit({ id: true, lastCheck: true });
-export const insertActivitySchema = createInsertSchema(activities).omit({ id: true, timestamp: true });
-export const insertWorkflowSchema = createInsertSchema(workflows).omit({ id: true });
-export const insertAnnotationSchema = createInsertSchema(annotations).omit({ id: true, createdAt: true });
+// Insert schemas - using manual Zod schemas for API validation instead of drizzle-zod due to compatibility issues
+export const insertAnnotationSchema = z.object({
+    inputText: z.string(),
+    resultJson: z.any()
+});
+// API Request/Response schemas
+export const annotateRequestSchema = z.object({
+    text: z.string().min(1).max(10000)
+});
+export const annotateResponseSchema = z.object({
+    annotations: z.array(z.string())
+});
+export const getAnnotationsQuerySchema = z.object({
+    limit: z.string().optional().transform(val => val ? parseInt(val) : undefined)
+});
 //# sourceMappingURL=schema.js.map
