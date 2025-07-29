@@ -735,14 +735,37 @@ export declare const annotations: import("drizzle-orm/pg-core").PgTableWithColum
     };
     dialect: "pg";
 }>;
-export declare const insertUserSchema: any;
-export declare const insertAgentSchema: any;
-export declare const insertPhaseSchema: any;
-export declare const insertRepositorySchema: any;
-export declare const insertServiceSchema: any;
-export declare const insertActivitySchema: any;
-export declare const insertWorkflowSchema: any;
-export declare const insertAnnotationSchema: any;
+export declare const insertAnnotationSchema: z.ZodObject<{
+    inputText: z.ZodString;
+    resultJson: z.ZodAny;
+}, "strip", z.ZodTypeAny, {
+    inputText: string;
+    resultJson?: any;
+}, {
+    inputText: string;
+    resultJson?: any;
+}>;
+export declare const annotateRequestSchema: z.ZodObject<{
+    text: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    text: string;
+}, {
+    text: string;
+}>;
+export declare const annotateResponseSchema: z.ZodObject<{
+    annotations: z.ZodArray<z.ZodString, "many">;
+}, "strip", z.ZodTypeAny, {
+    annotations: string[];
+}, {
+    annotations: string[];
+}>;
+export declare const getAnnotationsQuerySchema: z.ZodObject<{
+    limit: z.ZodEffects<z.ZodOptional<z.ZodString>, number | undefined, string | undefined>;
+}, "strip", z.ZodTypeAny, {
+    limit?: number | undefined;
+}, {
+    limit?: string | undefined;
+}>;
 export type User = typeof users.$inferSelect;
 export type Agent = typeof agents.$inferSelect;
 export type Phase = typeof phases.$inferSelect;
@@ -751,11 +774,47 @@ export type Service = typeof services.$inferSelect;
 export type Activity = typeof activities.$inferSelect;
 export type Workflow = typeof workflows.$inferSelect;
 export type Annotation = typeof annotations.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type InsertAgent = z.infer<typeof insertAgentSchema>;
-export type InsertPhase = z.infer<typeof insertPhaseSchema>;
-export type InsertRepository = z.infer<typeof insertRepositorySchema>;
-export type InsertService = z.infer<typeof insertServiceSchema>;
-export type InsertActivity = z.infer<typeof insertActivitySchema>;
-export type InsertWorkflow = z.infer<typeof insertWorkflowSchema>;
 export type InsertAnnotation = z.infer<typeof insertAnnotationSchema>;
+export type InsertUser = {
+    username: string;
+    password: string;
+};
+export type InsertAgent = {
+    name: string;
+    type: string;
+    description: string;
+    status?: string;
+    config?: any;
+    emoji: string;
+    provider: string;
+};
+export type InsertPhase = {
+    name: string;
+    description: string;
+    status?: string;
+    progress?: number;
+    order: number;
+};
+export type InsertRepository = {
+    name: string;
+    status?: string;
+    isPrivate?: boolean;
+};
+export type InsertService = {
+    name: string;
+    status?: string;
+};
+export type InsertActivity = {
+    title: string;
+    type?: string;
+};
+export type InsertWorkflow = {
+    fromAgent: string;
+    toAgent: string;
+    description: string;
+    artifact: string;
+    status?: string;
+};
+export type AnnotateRequest = z.infer<typeof annotateRequestSchema>;
+export type AnnotateResponse = z.infer<typeof annotateResponseSchema>;
+export type GetAnnotationsQuery = z.infer<typeof getAnnotationsQuerySchema>;

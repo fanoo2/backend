@@ -1,5 +1,4 @@
 import { pgTable, text, serial, integer, boolean, jsonb, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable("users", {
@@ -66,15 +65,24 @@ export const annotations = pgTable("annotations", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({ id: true }) as any;
-export const insertAgentSchema = createInsertSchema(agents).omit({ id: true, lastUpdated: true }) as any;
-export const insertPhaseSchema = createInsertSchema(phases).omit({ id: true }) as any;
-export const insertRepositorySchema = createInsertSchema(repositories).omit({ id: true }) as any;
-export const insertServiceSchema = createInsertSchema(services).omit({ id: true, lastCheck: true }) as any;
-export const insertActivitySchema = createInsertSchema(activities).omit({ id: true, timestamp: true }) as any;
-export const insertWorkflowSchema = createInsertSchema(workflows).omit({ id: true }) as any;
-export const insertAnnotationSchema = createInsertSchema(annotations).omit({ id: true, createdAt: true }) as any;
+// Insert schemas - using manual Zod schemas for API validation instead of drizzle-zod due to compatibility issues
+export const insertAnnotationSchema = z.object({
+  inputText: z.string(),
+  resultJson: z.any()
+});
+
+// API Request/Response schemas
+export const annotateRequestSchema = z.object({
+  text: z.string().min(1).max(10000)
+});
+
+export const annotateResponseSchema = z.object({
+  annotations: z.array(z.string())
+});
+
+export const getAnnotationsQuerySchema = z.object({
+  limit: z.string().optional().transform(val => val ? parseInt(val) : undefined)
+});
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -86,11 +94,18 @@ export type Activity = typeof activities.$inferSelect;
 export type Workflow = typeof workflows.$inferSelect;
 export type Annotation = typeof annotations.$inferSelect;
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type InsertAgent = z.infer<typeof insertAgentSchema>;
-export type InsertPhase = z.infer<typeof insertPhaseSchema>;
-export type InsertRepository = z.infer<typeof insertRepositorySchema>;
-export type InsertService = z.infer<typeof insertServiceSchema>;
-export type InsertActivity = z.infer<typeof insertActivitySchema>;
-export type InsertWorkflow = z.infer<typeof insertWorkflowSchema>;
 export type InsertAnnotation = z.infer<typeof insertAnnotationSchema>;
+
+// Simplified types for storage compatibility (without drizzle-zod)
+export type InsertUser = { username: string; password: string };
+export type InsertAgent = { name: string; type: string; description: string; status?: string; config?: any; emoji: string; provider: string };
+export type InsertPhase = { name: string; description: string; status?: string; progress?: number; order: number };
+export type InsertRepository = { name: string; status?: string; isPrivate?: boolean };
+export type InsertService = { name: string; status?: string };
+export type InsertActivity = { title: string; type?: string };
+export type InsertWorkflow = { fromAgent: string; toAgent: string; description: string; artifact: string; status?: string };
+
+// API Request/Response types
+export type AnnotateRequest = z.infer<typeof annotateRequestSchema>;
+export type AnnotateResponse = z.infer<typeof annotateResponseSchema>;
+export type GetAnnotationsQuery = z.infer<typeof getAnnotationsQuerySchema>;

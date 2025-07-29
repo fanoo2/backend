@@ -1,7 +1,7 @@
 import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
-// Schema imports removed - not currently used in routes
+import { annotateRequestSchema, annotateResponseSchema, getAnnotationsQuerySchema } from "../shared/schema.js";
 import { annotate, annotateTextWithAI, generateBasicAnnotations } from "./annotator.js";
 import axios from "axios";
 import { AccessToken } from 'livekit-server-sdk';
@@ -212,23 +212,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI Services endpoints
   app.post("/api/annotate", async (req, res) => {
     try {
-      const { text } = req.body;
-
-      if (!text || typeof text !== 'string') {
+      // Validate request body using Zod schema
+      const parseResult = annotateRequestSchema.safeParse(req.body);
+      
+      if (!parseResult.success) {
         return res.status(400).json({ 
           message: "Invalid request",
-          code: "INVALID_TEXT",
-          details: { error: "Text field is required and must be a string" }
+          code: "VALIDATION_ERROR",
+          details: { errors: parseResult.error.errors }
         });
       }
 
-      if (text.length > 10000) {
-        return res.status(400).json({
-          message: "Text too long",
-          code: "TEXT_TOO_LONG", 
-          details: { maxLength: 10000, actualLength: text.length }
-        });
-      }
+      const { text } = parseResult.data;
 
       let annotations: string[];
       let analysisMethod = "openai";
@@ -277,7 +272,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get recent annotations for monitoring
   app.get("/api/annotations", async (req, res) => {
     try {
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      // Validate query parameters using Zod schema
+      const parseResult = getAnnotationsQuerySchema.safeParse(req.query);
+      
+      if (!parseResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid query parameters",
+          code: "VALIDATION_ERROR",
+          details: { errors: parseResult.error.errors }
+        });
+      }
+
+      const { limit } = parseResult.data;
       const annotations = await storage.getRecentAnnotations(limit);
       res.json(annotations);
     } catch (_error) {
@@ -334,13 +340,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Stripe webhook endpoint
-  app.post("/payments/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+  app.post("/api/payments/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!endpointSecret) {
       console.error('Stripe webhook secret not configured');
       return res.status(500).send('Webhook secret not configured');
+    }
+
+    if (!sig) {
+      console.error('Missing stripe-signature header');
+      return res.status(400).send('Missing stripe-signature header');
     }
 
     let event;

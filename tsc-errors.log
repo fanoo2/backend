@@ -1,0 +1,10 @@
+server/storage.ts(277,11): error TS2322: Type '{ id: number; lastUpdated: Date; name: string; type: string; description: string; status?: string; config?: any; emoji: string; provider: string; }' is not assignable to type '{ id: number; name: string; type: string; description: string; status: string; config: unknown; emoji: string; provider: string; lastUpdated: Date | null; }'.
+  Types of property 'status' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+server/storage.ts(338,11): error TS2322: Type '{ id: number; timestamp: Date; title: string; type?: string; }' is not assignable to type '{ id: number; type: string; title: string; timestamp: Date | null; }'.
+  Types of property 'type' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+server/storage.ts(358,11): error TS2322: Type '{ id: number; createdAt: Date; inputText: string; resultJson?: any; }' is not assignable to type '{ id: number; inputText: string; resultJson: unknown; createdAt: Date; }'.
+  Property 'resultJson' is optional in type '{ id: number; createdAt: Date; inputText: string; resultJson?: any; }' but required in type '{ id: number; inputText: string; resultJson: unknown; createdAt: Date; }'.
