@@ -1,0 +1,80 @@
+name: Orchestrator Trigger
+
+on:
+  workflow_dispatch:
+    inputs:
+      agent_type:
+        description: 'Type of agent to trigger'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - uiux-designer
+          - webrtc-engineer
+          - backend-developer
+          - frontend-developer
+          - payment-specialist
+          - moderation-agent
+          - devops-engineer
+  repository_dispatch:
+    types: 
+      - payments-sdk-published
+      - backend-orchestrator-trigger
+      - trigger-frontend-agent
+
+jobs:
+  orchestrate-agents:
+    name: Run AI Agent Pipeline
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run Orchestrator
+        run: npm run orchestrate
+        env:
+          AGENT_TYPE: ${{ github.event.inputs.agent_type || 'all' }}
+          TRIGGER_SOURCE: ${{ github.event_name }}
+          PAYMENTS_SDK_VERSION: ${{ github.event.client_payload.version }}
+          
+      - name: Upload Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orchestrator-artifacts-${{ github.run_id }}
+          path: |
+            artifacts/
+            !artifacts/**/*.tmp
+          retention-days: 30
+
+  notify-completion:
+    name: Notify Completion
+    runs-on: ubuntu-latest
+    needs: orchestrate-agents
+    if: github.event_name == 'repository_dispatch'
+    
+    steps:
+      - name: Notify Frontend on Completion
+        if: github.event.action == 'backend-orchestrator-trigger'
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.FRONTEND_PAT || secrets.GITHUB_TOKEN }}
+          repository: fanoo2/frontend
+          event-type: backend-orchestrator-completed
+          client-payload: |
+            {
+              "backend_run_id": "${{ github.run_id }}",
+              "status": "${{ needs.orchestrate-agents.result }}",
+              "artifacts_url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
