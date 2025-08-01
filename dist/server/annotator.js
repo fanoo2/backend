@@ -1,8 +1,5 @@
 import OpenAI from "openai";
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
 /**
  * Simple annotation function as requested - calls OpenAI and returns string array
  * @param text The input text to analyze
@@ -12,6 +9,9 @@ export async function annotate(text) {
     if (!process.env.OPENAI_API_KEY) {
         throw new Error("OpenAI API key not configured");
     }
+    const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY
+    });
     try {
         const response = await openai.chat.completions.create({
             model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -58,6 +58,9 @@ export async function annotateTextWithAI(text) {
     if (!process.env.OPENAI_API_KEY) {
         throw new Error("OpenAI API key not configured");
     }
+    const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY
+    });
     try {
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
