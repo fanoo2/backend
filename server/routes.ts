@@ -420,6 +420,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .json({ error: 'LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be set.' });
     }
 
+    if (!url) {
+      return res
+        .status(500)
+        .json({ error: 'LIVEKIT_URL must be set. Please provide a valid LiveKit server URL.' });
+    }
+
     // Generate a random identity if none provided
     const userIdentity = identity ?? randomUUID();
 
@@ -433,7 +439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json({
         identity: userIdentity,
         token,
-        url: url || 'wss://your-livekit-url.com',
+        url,
         roomName
       });
     } catch (err: any) {
@@ -469,7 +475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         try {
           await axios.post(
-            'https://api.github.com/repos/YOUR-ORG/frontend/actions/workflows/run-frontend-agent.yml/dispatches',
+            'https://api.github.com/repos/fanoo2/frontend/actions/workflows/run-frontend-agent.yml/dispatches',
             {
               ref: 'main',
               inputs: { sdk_version: version || 'latest' }
