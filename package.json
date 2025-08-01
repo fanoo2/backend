@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "AI Annotation Backend",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/server/index.js",
   "scripts": {
     "dev": "tsx index.ts",
     "build": "./node_modules/.bin/tsc -p tsconfig.json",
-    "start": "node -r tsconfig-paths/register dist/index.js",
+    "start": "node -r tsconfig-paths/register dist/server/index.js",
     "server": "tsx server/index.ts",
     "lint": "eslint . --ext .ts --config .eslintrc.cjs",
     "test": "npm run test:unit && npm run test:health",
