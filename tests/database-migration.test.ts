@@ -1,10 +1,14 @@
+// Import for schema validation only - not used in runtime
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { drizzle } from 'drizzle-orm/postgres-js';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import { users, agents, phases, repositories, services, activities, workflows, annotations } from '../shared/schema';
 
 // Mock the database functionality for testing
 describe('Database Migration Tests', () => {
-  // Mock database connection
+  // Mock database connection - kept for potential future use
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const mockConnection = {
     query: jest.fn(),
     end: jest.fn(),
@@ -99,7 +103,9 @@ describe('Database Migration Tests', () => {
 
   describe('Migration File Existence', () => {
     test('migration files should exist', () => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const fs = require('fs');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const path = require('path');
       
       const migrationsDir = path.join(__dirname, '../migrations');
@@ -110,7 +116,9 @@ describe('Database Migration Tests', () => {
     });
 
     test('initial migration should contain all tables', () => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const fs = require('fs');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const path = require('path');
       
       const migrationsDir = path.join(__dirname, '../migrations');
@@ -197,6 +205,7 @@ describe('Database Migration Tests', () => {
       // Clear the require cache to reload the config
       delete require.cache[require.resolve('../drizzle.config.ts')];
       
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const drizzleConfig = require('../drizzle.config.ts');
       expect(drizzleConfig.default).toBeDefined();
       expect(drizzleConfig.default.out).toBe('./migrations');
