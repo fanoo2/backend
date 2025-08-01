@@ -66,7 +66,8 @@ if (process.argv.includes('--health')) {
 (async () => {
   const server = await registerRoutes(app);
 
-  app.use((err: any, req: Request, res: Response, _: NextFunction) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 

@@ -1,9 +1,7 @@
-import request from 'supertest';
-import express, { type Express } from 'express';
+import express from 'express';
 import cors from 'cors';
 
 describe('Environment Configuration Tests', () => {
-  let app: Express;
   let originalEnv: typeof process.env;
 
   beforeEach(() => {

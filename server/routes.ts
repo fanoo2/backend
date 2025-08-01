@@ -384,12 +384,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // LiveKit token endpoint
   app.post('/api/token', express.json(), (req, res) => {
+    const apiKey = process.env.LIVEKIT_API_KEY;
+    const apiSecret = process.env.LIVEKIT_API_SECRET;
+    
+    if (!apiKey || !apiSecret) {
+      return res.status(500).json({ error: 'LiveKit credentials not configured' });
+    }
+    
     const identity = req.body.identity || `guest_${Math.random()
       .toString(36)
       .substring(2)}`;
     const at = new AccessToken(
-      process.env.LIVEKIT_API_KEY!,
-      process.env.LIVEKIT_API_SECRET!,
+      apiKey,
+      apiSecret,
       { ttl: 3600, identity }
     );
     at.addGrant({ roomJoin: true });
