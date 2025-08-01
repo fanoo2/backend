@@ -43,7 +43,7 @@ describe('Configuration Fixes', () => {
     // Agent events endpoint simulation
     app.post("/agent-events", async (req, res) => {
       try {
-        const { agent, status, version } = req.body;
+        const { agent, status } = req.body;
 
         if (!agent || !status) {
           return res.status(400).json({ message: "Agent and status are required" });
