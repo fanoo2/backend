@@ -343,6 +343,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).send('Webhook secret not configured');
     }
 
+    if (!sig) {
+      console.error('Missing stripe-signature header');
+      return res.status(400).send('Missing stripe-signature header');
+    }
+
     let event;
 
     try {

@@ -1,7 +1,11 @@
+import express from "express";
 import { createServer } from "http";
 import { storage } from "./storage.js";
 // Schema imports removed - not currently used in routes
 import { annotate, annotateTextWithAI, generateBasicAnnotations } from "./annotator.js";
+import axios from "axios";
+import { AccessToken } from 'livekit-server-sdk';
+import { randomUUID } from 'crypto';
 export async function registerRoutes(app) {
     // Root route - serves a welcome page
     app.get("/", (req, res) => {
@@ -23,43 +27,43 @@ export async function registerRoutes(app) {
           <div class="container">
             <h1>🤖 Fanno AI Platform API</h1>
             <p>Welcome to the Fanno AI Platform API server. This service provides AI-powered text annotation and analysis capabilities.</p>
-            
+
             <h2>Available Endpoints</h2>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/health</code> - Health check
             </div>
-            
+
             <div class="endpoint">
               <span class="method">POST</span> <code>/api/annotate</code> - Annotate text with AI analysis
               <br><small>Body: {"text": "your text here"}</small>
             </div>
-            
+
             <div class="endpoint">
               <span class="method">POST</span> <code>/api/annotate-simple</code> - Simple text annotation
               <br><small>Body: {"text": "your text here"}</small>
             </div>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/api/annotations</code> - Get recent annotations
             </div>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/api/stats</code> - Get platform statistics
             </div>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/api/agents</code> - Get all agents
             </div>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/api/workflows</code> - Get all workflows
             </div>
-            
+
             <div class="endpoint">
               <span class="method">GET</span> <code>/api/activities</code> - Get recent activities
             </div>
-            
+
             <p><strong>Status:</strong> Service is running and ready to accept requests.</p>
           </div>
         </body>
@@ -269,6 +273,174 @@ export async function registerRoutes(app) {
         }
         catch (_error) {
             res.status(500).json({ message: "Failed to fetch annotations" });
+        }
+    });
+    // Stripe payments endpoint
+    app.post("/payments/create-session", async (req, res) => {
+        try {
+            const { amount, currency } = req.body;
+            if (!amount || !currency) {
+                return res.status(400).json({
+                    message: "Amount and currency are required"
+                });
+            }
+            if (!process.env.STRIPE_SECRET_KEY) {
+                return res.status(500).json({
+                    message: "Stripe configuration missing",
+                    error: "STRIPE_SECRET_KEY not configured"
+                });
+            }
+            const { default: Stripe } = await import('stripe');
+            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+            const session = await stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: [{
+                        price_data: {
+                            currency: currency,
+                            product_data: {
+                                name: 'Fanno AI Platform Service',
+                            },
+                            unit_amount: amount,
+                        },
+                        quantity: 1,
+                    }],
+                mode: 'payment',
+                success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/success`,
+                cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/cancel`,
+            });
+            res.json({ sessionId: session.id, url: session.url });
+        }
+        catch (error) {
+            console.error("Payment session creation failed:", error);
+            res.status(500).json({
+                message: "Failed to create payment session",
+                error: error instanceof Error ? error.message : "Unknown error"
+            });
+        }
+    });
+    // Stripe webhook endpoint
+    app.post("/payments/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+        const sig = req.headers['stripe-signature'];
+        const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+        if (!endpointSecret) {
+            console.error('Stripe webhook secret not configured');
+            return res.status(500).send('Webhook secret not configured');
+        }
+        if (!sig) {
+            console.error('Missing stripe-signature header');
+            return res.status(400).send('Missing stripe-signature header');
+        }
+        let event;
+        try {
+            const { default: Stripe } = await import('stripe');
+            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+            event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+        }
+        catch (err) {
+            console.error('Webhook signature verification failed:', err instanceof Error ? err.message : 'Unknown error');
+            return res.status(400).send(`Webhook Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
+        // Handle the event
+        switch (event.type) {
+            case 'checkout.session.completed': {
+                const session = event.data.object;
+                console.log('Payment succeeded:', session.id);
+                // TODO: Fulfill the purchase, update database, send confirmation email, etc.
+                // You can access session.customer_email, session.amount_total, etc.
+                break;
+            }
+            case 'payment_intent.payment_failed': {
+                const paymentIntent = event.data.object;
+                console.log('Payment failed:', paymentIntent.id);
+                break;
+            }
+            default:
+                console.log(`Unhandled event type ${event.type}`);
+        }
+        res.json({ received: true });
+    });
+    // LiveKit token endpoint
+    app.post('/api/token', express.json(), (req, res) => {
+        const identity = req.body.identity || `guest_${Math.random()
+            .toString(36)
+            .substring(2)}`;
+        const at = new AccessToken(process.env.LIVEKIT_API_KEY, process.env.LIVEKIT_API_SECRET, { ttl: 3600, identity });
+        at.addGrant({ roomJoin: true });
+        res.json({ token: at.toJwt() });
+    });
+    // LiveKit token endpoint
+    app.post('/api/livekit/token', express.json(), async (req, res) => {
+        const { identity, roomName } = req.body;
+        const apiKey = process.env.LIVEKIT_API_KEY;
+        const apiSecret = process.env.LIVEKIT_API_SECRET;
+        const url = process.env.LIVEKIT_URL;
+        if (!apiKey || !apiSecret) {
+            return res
+                .status(500)
+                .json({ error: 'LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be set.' });
+        }
+        // Generate a random identity if none provided
+        const userIdentity = identity ?? randomUUID();
+        try {
+            // Build the AccessToken with room grants
+            const at = new AccessToken(apiKey, apiSecret, { identity: userIdentity });
+            at.addGrant({ roomJoin: true, room: roomName });
+            const token = at.toJwt();
+            return res.json({
+                identity: userIdentity,
+                token,
+                url: url || 'wss://your-livekit-url.com',
+                roomName
+            });
+        }
+        catch (err) {
+            console.error('LiveKit token error:', err);
+            return res
+                .status(500)
+                .json({ error: err?.message || 'Failed to generate LiveKit token' });
+        }
+    });
+    // Agent events endpoint for orchestrator
+    app.post("/agent-events", async (req, res) => {
+        try {
+            const { agent, status, version } = req.body;
+            if (!agent || !status) {
+                return res.status(400).json({ message: "Agent and status are required" });
+            }
+            // Only process completed events
+            if (status !== 'completed') {
+                return res.sendStatus(204);
+            }
+            // Only trigger frontend when payment is done
+            if (agent === 'payment-specialist') {
+                const ghToken = process.env.GH_ACTIONS_TOKEN;
+                if (!ghToken) {
+                    console.warn("GH_ACTIONS_TOKEN not found, skipping GitHub workflow dispatch");
+                    return res.sendStatus(200);
+                }
+                try {
+                    await axios.post('https://api.github.com/repos/YOUR-ORG/frontend/actions/workflows/run-frontend-agent.yml/dispatches', {
+                        ref: 'main',
+                        inputs: { sdk_version: version || 'latest' }
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${ghToken}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    console.log(`GitHub workflow dispatched for payment-specialist completion`);
+                }
+                catch (githubError) {
+                    console.error("Failed to dispatch GitHub workflow:", githubError instanceof Error ? githubError.message : "Unknown error");
+                    // Don't fail the request if GitHub call fails
+                }
+            }
+            res.sendStatus(200);
+        }
+        catch (error) {
+            console.error("Agent events error:", error instanceof Error ? error.message : "Unknown error");
+            res.status(500).json({ message: "Failed to process agent event" });
         }
     });
     const httpServer = createServer(app);
