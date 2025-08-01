@@ -10,6 +10,9 @@ build/
 *.tsbuildinfo
 tsc-errors.log
 
+# Generated artifacts
+artifacts/
+
 # Environment variables
 .env
 .env.local
