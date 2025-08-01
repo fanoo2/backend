@@ -41,8 +41,6 @@ spec:
             exec:
               command:
                 - node
-                - -r
-                - tsconfig-paths/register
                 - dist/index.js
                 - --health
             initialDelaySeconds: 30
@@ -53,8 +51,6 @@ spec:
             exec:
               command:
                 - node
-                - -r
-                - tsconfig-paths/register
                 - dist/index.js
                 - --health
             initialDelaySeconds: 5

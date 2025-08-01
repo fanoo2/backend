@@ -8,28 +8,28 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (including dev dependencies for TypeScript)
-RUN npm ci
+# Install all dependencies for building
+RUN npm ci --silent --no-audit --no-fund
 
 # Copy source code
 COPY . .
 
-# Build the application using npm script which handles the TypeScript build properly
+# Build the application
 RUN npm run build
 
-# Production stage
+# Production stage  
 FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files and install only production dependencies
 COPY package*.json ./
-
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --omit=dev --silent --no-audit --no-fund && \
+    npm cache clean --force
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/shared ./shared
 
 # Create a non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
@@ -42,9 +42,9 @@ USER nodejs
 # Expose the port the app runs on
 EXPOSE 5000
 
-# Health check
+# Health check (without tsconfig-paths since we're in production with built files)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -r tsconfig-paths/register dist/index.js --health || exit 1
+  CMD node dist/index.js --health || exit 1
 
 # Start the application
-CMD ["node", "-r", "tsconfig-paths/register", "dist/index.js"]
+CMD ["node", "dist/index.js"]
