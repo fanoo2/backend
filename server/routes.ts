@@ -344,8 +344,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     if (!sig) {
-      console.error('Missing stripe-signature header');
-      return res.status(400).send('Missing stripe-signature header');
+      console.error('Missing stripe signature');
+      return res.status(400).send('Missing stripe signature');
     }
 
     let event;

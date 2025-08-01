@@ -1,0 +1,16 @@
+apiVersion: v2
+name: backend
+description: AI Annotation Backend
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+  - name: fanoo2
+    email: contact@fanoo2.com
+keywords:
+  - backend
+  - api
+  - ai
+  - annotation
+sources:
+  - https://github.com/fanoo2/backend
