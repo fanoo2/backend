@@ -6,12 +6,38 @@ const app = express();
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://20cb041c-29ee-4ed6-9fb7-89e207c36447-00-34lt6eadu20q9.kirk.replit.dev';
 
-app.use(cors({
-  origin: FRONTEND_URL,
+// Dynamic CORS configuration to handle Replit's changing URLs
+// This configuration allows:
+// 1. The configured FRONTEND_URL (for production)
+// 2. Any .replit.dev domain (for development flexibility)
+// 3. localhost/127.0.0.1 (for local development)
+// 4. Requests with no origin (mobile apps, curl, etc.)
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow the configured frontend URL
+    if (origin === FRONTEND_URL) return callback(null, true);
+    
+    // Allow any Replit.dev domain for development flexibility
+    if (origin.includes('.replit.dev')) return callback(null, true);
+    
+    // Allow localhost for local development
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) return callback(null, true);
+    
+    // Allow the origin if FRONTEND_URL is not set (development mode)
+    if (!process.env.FRONTEND_URL) return callback(null, true);
+    
+    // Otherwise, deny the request
+    callback(new Error('Not allowed by CORS'), false);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
