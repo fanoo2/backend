@@ -7,7 +7,7 @@ on:
   pull_request:
     branches: [ main, master ]
   repository_dispatch:
-    types: [payments-sdk-published]
+    types: [payments-sdk-published, design-system-updated, webrtc-client-updated]
 
 env:
   REGISTRY: ghcr.io
@@ -117,7 +117,7 @@ jobs:
     name: Trigger Frontend Orchestrator
     runs-on: ubuntu-latest
     needs: [build-and-push-docker]
-    if: github.event_name == 'repository_dispatch' && github.event.action == 'payments-sdk-published'
+    if: github.event_name == 'repository_dispatch' && (github.event.action == 'payments-sdk-published' || github.event.action == 'design-system-updated' || github.event.action == 'webrtc-client-updated')
     
     steps:
       - name: Trigger Frontend Agent
@@ -130,5 +130,47 @@ jobs:
             {
               "backend_version": "${{ github.sha }}",
               "payments_sdk_version": "${{ github.event.client_payload.version }}",
-              "trigger_source": "payments-sdk-published"
+              "design_system_version": "${{ github.event.client_payload.design_system_version }}",
+              "webrtc_client_version": "${{ github.event.client_payload.webrtc_client_version }}",
+              "trigger_source": "${{ github.event.action }}"
+            }
+
+  trigger-design-system-dispatch:
+    name: Trigger Design System Updates
+    runs-on: ubuntu-latest
+    needs: [build-and-push-docker]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Trigger Design System Repository
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DESIGN_SYSTEM_PAT || secrets.GITHUB_TOKEN }}
+          repository: fanoo2/design-system
+          event-type: backend-updated
+          client-payload: |
+            {
+              "backend_version": "${{ github.sha }}",
+              "backend_tag": "${{ github.ref_name }}",
+              "trigger_source": "backend-push"
+            }
+
+  trigger-webrtc-client-dispatch:
+    name: Trigger WebRTC Client Updates
+    runs-on: ubuntu-latest
+    needs: [build-and-push-docker]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Trigger WebRTC Client Repository
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.WEBRTC_CLIENT_PAT || secrets.GITHUB_TOKEN }}
+          repository: fanoo2/webrtc-client
+          event-type: backend-updated
+          client-payload: |
+            {
+              "backend_version": "${{ github.sha }}",
+              "backend_tag": "${{ github.ref_name }}",
+              "trigger_source": "backend-push"
             }
