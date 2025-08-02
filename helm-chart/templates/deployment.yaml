@@ -65,6 +65,43 @@ spec:
                   name: {{ include "backend.fullname" $ }}
                   key: {{ $key }}
             {{- end }}
+            # Secret environment variables
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.database.name }}
+                  key: {{ .Values.secrets.database.key }}
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.stripe.secretKey.name }}
+                  key: {{ .Values.secrets.stripe.secretKey.key }}
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.stripe.webhookSecret.name }}
+                  key: {{ .Values.secrets.stripe.webhookSecret.key }}
+            - name: LIVEKIT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.livekit.url.name }}
+                  key: {{ .Values.secrets.livekit.url.key }}
+            - name: LIVEKIT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.livekit.apiKey.name }}
+                  key: {{ .Values.secrets.livekit.apiKey.key }}
+            - name: LIVEKIT_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.livekit.apiSecret.name }}
+                  key: {{ .Values.secrets.livekit.apiSecret.key }}
+            - name: GH_ACTIONS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.github.token.name }}
+                  key: {{ .Values.secrets.github.token.key }}
+                  optional: true
           {{- with .Values.envFrom }}
           envFrom:
             {{- toYaml . | nindent 12 }}
