@@ -6,15 +6,16 @@
   "main": "dist/server/index.js",
   "scripts": {
     "dev": "tsx index.ts",
-    "build": "./node_modules/.bin/tsc -p tsconfig.json",
+    "build": "npx tsc -p tsconfig.json",
     "start": "node -r tsconfig-paths/register dist/server/index.js",
     "server": "tsx server/index.ts",
     "lint": "eslint . --ext .ts --config .eslintrc.cjs",
     "test": "npm run test:unit && npm run test:health",
-    "test:unit": "jest",
+    "test:unit": "npx jest",
     "test:health": "npm run build && node -r tsconfig-paths/register dist/index.js --health",
     "test:smoke": "./smoke-test.sh",
     "test:all": "npm run test:unit && npm run test:health && npm run test:smoke",
+    "validate-env": "tsx src/env-validation.ts",
     "orchestrate": "tsx orchestrator.ts"
   },
   "dependencies": {

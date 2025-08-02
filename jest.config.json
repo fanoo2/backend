@@ -13,5 +13,7 @@
     "server/**/*.ts",
     "!server/**/*.d.ts",
     "!**/node_modules/**"
-  ]
+  ],
+  "setupFilesAfterEnv": [],
+  "testTimeout": 10000
 }

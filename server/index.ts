@@ -1,6 +1,10 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { registerRoutes } from "./routes.js";
+import { startupCheck } from "../src/env-validation.js";
+
+// Validate environment before starting server
+startupCheck();
 
 const app = express();
 

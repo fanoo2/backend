@@ -82,11 +82,44 @@ tolerations: []
 
 affinity: {}
 
-# Environment variables
+# Environment variables - using secrets for sensitive data
 env:
   FRONTEND_URL: "https://example.com"
-  DATABASE_URL: "postgresql://user:password@localhost:5432/db"
   NODE_ENV: "production"
+
+# Secret references for sensitive configuration
+secrets:
+  # Database configuration secret
+  database:
+    name: "backend-database-secret"
+    key: "DATABASE_URL"
+  
+  # Stripe configuration secrets
+  stripe:
+    secretKey:
+      name: "backend-stripe-secret"
+      key: "STRIPE_SECRET_KEY"
+    webhookSecret:
+      name: "backend-stripe-secret" 
+      key: "STRIPE_WEBHOOK_SECRET"
+  
+  # LiveKit configuration secrets
+  livekit:
+    url:
+      name: "backend-livekit-secret"
+      key: "LIVEKIT_URL"
+    apiKey:
+      name: "backend-livekit-secret"
+      key: "LIVEKIT_API_KEY"
+    apiSecret:
+      name: "backend-livekit-secret"
+      key: "LIVEKIT_API_SECRET"
+  
+  # GitHub Actions token (optional)
+  github:
+    token:
+      name: "backend-github-secret"
+      key: "GH_ACTIONS_TOKEN"
 
 # Additional environment variables from secrets or configmaps
 envFrom: []
