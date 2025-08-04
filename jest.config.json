@@ -5,9 +5,7 @@
     "**/__tests__/**/*.ts",
     "**/?(*.)+(spec|test).ts"
   ],
-  "transform": {
-    "^.+\\.ts$": "<rootDir>/node_modules/ts-jest/dist/index.js"
-  },
+  "preset": "ts-jest/presets/default",
   "collectCoverageFrom": [
     "server/**/*.ts",
     "!server/**/*.d.ts",
@@ -17,5 +15,6 @@
   "testTimeout": 10000,
   "moduleNameMapper": {
     "^@shared/(.*)$": "<rootDir>/shared/$1"
-  }
+  },
+  "setupFilesAfterEnv": ["<rootDir>/tests/setup.ts"]
 }

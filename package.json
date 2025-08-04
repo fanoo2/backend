@@ -27,6 +27,7 @@
     "@vitejs/plugin-react": "^4.6.0",
     "axios": "^1.10.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.4",
     "drizzle-zod": "^0.8.2",
