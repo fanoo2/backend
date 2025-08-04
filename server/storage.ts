@@ -2,7 +2,7 @@ import {
   type User, type Agent, type Phase, type Repository, type Service, type Activity, type Workflow, type Annotation,
   type InsertUser, type InsertAgent, type InsertPhase, type InsertRepository, 
   type InsertService, type InsertActivity, type InsertWorkflow, type InsertAnnotation
-} from "@shared/schema";
+} from "../shared/schema.js";
 import { DatabaseStorage } from "./database.js";
 import { initializeDatabase } from "./init-db.js";
 

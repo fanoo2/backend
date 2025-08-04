@@ -16,11 +16,14 @@
     "declaration": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "types": ["node", "jest"],
+    "types": ["node"],
     "paths": {
       "@shared/*": ["shared/*"]
     }
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "exclude": ["node_modules", "dist", "tests"],
+  "ts-node": {
+    "esm": true
+  }
 }

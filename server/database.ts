@@ -1,11 +1,11 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import * as schema from '@shared/schema';
+import * as schema from '../shared/schema.js';
 import { 
   type User, type Agent, type Phase, type Repository, type Service, type Activity, type Workflow, type Annotation,
   type InsertUser, type InsertAgent, type InsertPhase, type InsertRepository, 
   type InsertService, type InsertActivity, type InsertWorkflow, type InsertAnnotation
-} from "@shared/schema";
+} from "../shared/schema.js";
 import { eq, desc } from 'drizzle-orm';
 import { IStorage } from './storage.js';
 
