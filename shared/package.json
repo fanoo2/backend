@@ -1,7 +1,0 @@
-{
-  "name": "@shared/schema",
-  "version": "1.0.0",
-  "type": "module",
-  "main": "schema.js",
-  "types": "schema.d.ts"
-}
