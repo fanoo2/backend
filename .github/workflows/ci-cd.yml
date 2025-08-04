@@ -86,7 +86,7 @@ jobs:
             -e DATABASE_URL="postgresql://postgres:postgres@localhost:5432/test_db" \
             -e NODE_ENV="production" \
             -e STRIPE_SECRET_KEY="sk_test_dummy" \
-            -e STRIPE_WEBHOOK_SECRET="whsec_dummy" \
+            -e STRIPE_WEBHOOK_SECRET="${{ secrets.STRIPE_WEBHOOK_SECRET }}" \
             -e LIVEKIT_URL="wss://test.livekit.cloud" \
             -e LIVEKIT_API_KEY="test_key" \
             -e LIVEKIT_API_SECRET="test_secret" \
