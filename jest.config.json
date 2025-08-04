@@ -5,7 +5,9 @@
     "**/__tests__/**/*.ts",
     "**/?(*.)+(spec|test).ts"
   ],
-  "preset": "ts-jest/presets/default",
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  },
   "collectCoverageFrom": [
     "server/**/*.ts",
     "!server/**/*.d.ts",
