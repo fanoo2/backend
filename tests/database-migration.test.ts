@@ -3,7 +3,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import { users, agents, phases, repositories, services, activities, workflows, annotations } from '../shared/schema.js';
+import { users, agents, phases, repositories, services, activities, workflows, annotations } from '../shared/schema';
 
 // Mock the database functionality for testing
 describe('Database Migration Tests', () => {

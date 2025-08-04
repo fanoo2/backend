@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals';
+// Jest configuration tests - using global Jest types
 
 describe('Jest Configuration Tests', () => {
   test('should run TypeScript tests successfully', () => {
