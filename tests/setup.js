@@ -1,5 +1,5 @@
 // Jest setup file - loads environment variables for tests
-import { config } from 'dotenv';
+const { config } = require('dotenv');
 
 // Load environment variables from .env file
 config();

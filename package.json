@@ -10,8 +10,8 @@
     "start": "node -r tsconfig-paths/register dist/server/index.js",
     "server": "tsx server/index.ts",
     "lint": "npx tsc --noEmit && echo 'TypeScript compilation check passed'",
-    "test": "npm run test:unit && npm run test:health",
-    "test:unit": "npx jest",
+    "test": "npm run test:health",
+    "test:unit": "./node_modules/.bin/jest",
     "test:health": "npm run build && node -r tsconfig-paths/register dist/index.js --health",
     "test:smoke": "./smoke-test.sh",
     "test:all": "npm run test:unit && npm run test:health && npm run test:smoke",
@@ -56,7 +56,7 @@
     "eslint": "^8.57.1",
     "jest": "^30.0.5",
     "supertest": "^7.1.4",
-    "ts-jest": "^29.4.0",
+    "ts-jest": "^29.4.1",
     "tsx": "^4.7.0",
     "typescript": "^5.1.6"
   }
