@@ -6,7 +6,7 @@
     "**/?(*.)+(spec|test).ts"
   ],
   "transform": {
-    "^.+\\.ts$": "ts-jest"
+    "^.+\\.ts$": "babel-jest"
   },
   "collectCoverageFrom": [
     "server/**/*.ts",
@@ -18,5 +18,5 @@
   "moduleNameMapper": {
     "^@shared/(.*)$": "<rootDir>/shared/$1"
   },
-  "setupFilesAfterEnv": ["<rootDir>/tests/setup.ts"]
+  "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"]
 }
